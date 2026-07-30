@@ -1,12 +1,64 @@
-# 05 — Inventário de Componentes de Arquitetura
+# 05 — Inventário de Componentes
 
-## 1. Objetivo deste documento
+Documento estrutural e permanente — inventário vivo de **todos** os componentes reutilizáveis do produto: `components/ui` (Design System puro), `components/charts` (wrappers Recharts) e `components/layout` (peças do AppShell). Toda vez que um componente novo for criado em qualquer uma dessas três pastas, ele deve ser adicionado à tabela correspondente aqui.
 
-Complementa [`docs/01-design-system.md`](./01-design-system.md) (inventário de componentes visuais de `components/ui`) registrando peças que não são "visuais" no mesmo sentido — são utilitários de arquitetura/RBAC pensados para serem reutilizados por qualquer módulo futuro (Cadastros, Financeiro, Comunicação etc.), não só pelo Dashboard onde foram introduzidos.
+Antes de criar um componente novo para uma tela, **verifique esta tabela primeiro** — a maior parte dos blocos visuais do produto já tem um equivalente pronto.
 
-Sempre que um componente ou hook nesta categoria for criado, ele deve ser registrado aqui — do mesmo jeito que `components/ui` é registrado em `docs/01-design-system.md`.
+## 1. `components/ui` — Design System
 
-## 2. usePermission
+Cada componente vive em sua própria pasta com barrel export (`index.ts`); o barrel agregador de tudo é `src/components/ui/index.ts`.
+
+| Componente | Caminho | Variantes | Props principais | Exemplo de uso |
+|---|---|---|---|---|
+| **Button** | `components/ui/Button` | `variant`: `primary` (padrão) · `secondary` · `ghost` · `danger`. `size`: `sm` · `md` (padrão) · `lg` | Todas as props nativas de `<button>` + `variant`, `size` | `<Button variant="primary" onClick={fn}>Salvar</Button>` |
+| **Card** | `components/ui/Card` | Nenhuma (visual único: `bg-white dark:bg-gray-900 rounded-xl shadow-sm border p-6`) | Compound: `Card`, `Card.Header`, `Card.Title`, `Card.Body` | `<Card><Card.Header><Card.Title>X</Card.Title></Card.Header><Card.Body>...</Card.Body></Card>` |
+| **Avatar** | `components/ui/Avatar` (wrapper `@radix-ui/react-avatar`) | Nenhuma | Compound: `Avatar` (`h-9 w-9 rounded-full`), `Avatar.Image`, `Avatar.Fallback` | `<Avatar><Avatar.Image src="..." /><Avatar.Fallback>V</Avatar.Fallback></Avatar>` |
+| **Badge** | `components/ui/Badge` | `variant`: `success` · `warning` · `danger` · `info` · `neutral` (padrão) | Props nativas de `<span>` + `variant` | `<Badge variant="success">pago</Badge>` |
+| **Table** | `components/ui/Table` | Nenhuma — sorting/filtro/paginação vêm de `@tanstack/react-table` | `columns: ColumnDef<TData, any>[]`, `data: TData[]`, `pageSize?`, `filterPlaceholder?`, `emptyTitle?`, `emptyDescription?` | Ver exemplo completo em `docs/01-design-system.md` §3 (Table) |
+| **Modal** | `components/ui/Modal` (wrapper `@radix-ui/react-dialog`) | Nenhuma | `Modal` = `Dialog.Root` (`open`, `onOpenChange`). Compound: `Trigger`, `Content` (`showCloseButton?`), `Title`, `Description`, `Footer`, `Close` | `<Modal><Modal.Trigger asChild><Button>Abrir</Button></Modal.Trigger><Modal.Content>...</Modal.Content></Modal>` |
+| **DropdownMenu** | `components/ui/DropdownMenu` (wrapper `@radix-ui/react-dropdown-menu`) | Nenhuma | Compound: `Trigger`, `Content`, `Item`, `CheckboxItem`, `RadioItem`, `Label`, `Separator`, `Group`, `RadioGroup`, `Sub`, `SubTrigger`, `SubContent` | `<DropdownMenu><DropdownMenu.Trigger asChild><Button>Opções</Button></DropdownMenu.Trigger><DropdownMenu.Content><DropdownMenu.Item>Perfil</DropdownMenu.Item></DropdownMenu.Content></DropdownMenu>` |
+| **Tabs** | `components/ui/Tabs` (wrapper `@radix-ui/react-tabs`) | Nenhuma | Compound: `Tabs` (`Root`), `Tabs.List`, `Tabs.Trigger`, `Tabs.Content` | `<Tabs defaultValue="geral"><Tabs.List><Tabs.Trigger value="geral">Geral</Tabs.Trigger></Tabs.List><Tabs.Content value="geral">...</Tabs.Content></Tabs>` |
+| **Tooltip** | `components/ui/Tooltip` (wrapper `@radix-ui/react-tooltip`) | Nenhuma | Compound: `Tooltip.Provider` (montar uma vez, já feito em `AppShell`), `Tooltip` (`Root`), `Trigger`, `Content` | `<Tooltip><Tooltip.Trigger asChild><Button size="sm">Ajuda</Button></Tooltip.Trigger><Tooltip.Content>Texto</Tooltip.Content></Tooltip>` |
+| **Select** | `components/ui/Select` (wrapper `@radix-ui/react-select`) | Nenhuma | Compound: `Select` (`Root`), `Trigger`, `Value`, `Content`, `Item`, `Label`, `Separator`, `Group` | `<Select defaultValue="financeiro"><Select.Trigger className="w-44"><Select.Value /></Select.Trigger><Select.Content><Select.Item value="financeiro">Financeiro</Select.Item></Select.Content></Select>` |
+| **Switch** | `components/ui/Switch` (wrapper `@radix-ui/react-switch`) | Nenhuma | Props do `Switch.Root` (`checked`, `onCheckedChange`, `defaultChecked`, `id`, `disabled`) | `<Switch id="notify" checked={v} onCheckedChange={setV} />` |
+| **Popover** | `components/ui/Popover` (wrapper `@radix-ui/react-popover`) | Nenhuma | Compound: `Popover` (`Root`), `Trigger`, `Content`, `Close`, `Anchor` | `<Popover><Popover.Trigger asChild><Button size="sm">Filtros</Button></Popover.Trigger><Popover.Content>...</Popover.Content></Popover>` |
+| **StatCard** | `components/ui/StatCard` | Nenhuma — cor do ícone via `iconColorClass` (props) | `icon: ReactNode`, `iconColorClass: string` (ex. `moduleColors.financeiro.iconClassName`), `label: string`, `value: string \| number`, `deltaPercent?`, `deltaLabel?` | `<StatCard icon={<Wallet />} iconColorClass={moduleColors.financeiro.iconClassName} label="Financeiro" value="R$ 82.430" deltaPercent={8.1} deltaLabel="vs mês anterior" />` |
+| **EmptyState** | `components/ui/EmptyState` | Nenhuma | `icon?: ReactNode`, `title: string`, `description?`, `action?: ReactNode` | `<EmptyState icon={<Inbox />} title="Nenhum item" description="..." action={<Button size="sm">Limpar filtros</Button>} />` |
+| **Skeleton** | `components/ui/Skeleton` | Nenhuma | Props nativas de `<div>`; largura/altura via `className` | `<Skeleton className="h-4 w-1/3" />` |
+| **Toast (Toaster)** | `components/ui/Toast` | 4 tipos via função (`success`/`error`/`info`/`warning`) | Montado uma vez em `src/main.tsx`; disparado via `toast` de `sonner` (não reimportar `Toaster`) | `toast.success('Registro salvo com sucesso.')` |
+| **Typography** | `components/ui/Typography` | `variant`: `h1` · `h2` · `body` (padrão) · `caption` · `kpi` — ver tabela de tipografia em `docs/04-design-tokens.md` | `variant`, `as?: ElementType` (sobrescreve a tag), `className?` | `<Typography variant="h1">Bom dia, William</Typography>` |
+| **PermissionGate** | `components/ui/permission-gate` | Nenhuma | `permission: string \| string[]`, `children`, `fallback?` (padrão `null`) | Ver seção 4 (Arquitetura e RBAC) abaixo |
+
+## 2. `components/charts` — wrappers Recharts
+
+Todos são puramente visuais (recebem `title` + `data` + configuração mínima via props) e já vêm dentro de um `Card` com `Card.Title`. Cores hex centralizadas em `src/lib/chart-theme.ts` (ver `docs/04-design-tokens.md` §2) via `useChartTheme()`. Tooltip customizado compartilhado: `components/charts/ChartTooltip.tsx`.
+
+| Componente | Caminho | Variantes | Props principais | Exemplo de uso |
+|---|---|---|---|---|
+| **AreaChartCard** | `components/charts/AreaChartCard` | Série 0 = violet-600 + gradiente; demais = cinza neutro | `title: string`, `data: Array<Record<string, string \| number>>`, `xKey: string`, `series: ChartSeriesConfig[]`, `height?` (280) | `<AreaChartCard title="Receita vs. meta" data={data} xKey="month" series={[{key:'receita'},{key:'meta'}]} />` |
+| **LineChartCard** | `components/charts/LineChartCard` | Série 0 = violet-600; demais = cinza neutro | Mesmas de `AreaChartCard` | `<LineChartCard title="Usuários ativos" data={data} xKey="day" series={[{key:'ativos'}]} />` |
+| **BarChartCard** | `components/charts/BarChartCard` | Igual `AreaChartCard` | Mesmas de `AreaChartCard` | `<BarChartCard title="Pedidos por canal" data={data} xKey="channel" series={[{key:'pedidos'}]} />` |
+| **DonutChartCard** | `components/charts/DonutChartCard` | Paleta categórica (`chartColors.categorical`) | `title`, `data: Array<{name, value}>`, `centerLabel?`, `centerValue?` | `<DonutChartCard title="Distribuição por módulo" data={data} centerLabel="Total" centerValue={60} />` |
+
+**Quando NÃO usar um wrapper de `charts/`:** se a referência visual exige um elemento extra no header do card (ex.: um `Select` de período), o wrapper genérico não expõe esse slot — replique a lógica de tema/tooltip diretamente com Recharts + `useChartTheme()`/`ChartTooltip`, como feito em `modules/dashboard/components/PerformanceCard.tsx` (ver `docs/03-pagina-dashboard.md`).
+
+## 3. `components/layout` — peças do AppShell
+
+Ver `docs/02-appshell-navegacao.md` para o funcionamento completo (RBAC do menu, tema, colapso da sidebar).
+
+| Componente | Caminho | Variantes | Props principais | Exemplo de uso |
+|---|---|---|---|---|
+| **AppShell** | `components/layout/AppShell.tsx` | Nenhuma | Sem props — lê `useSidebarStore`, `useVisibleMenu` diretamente; renderiza `<Outlet />` | Elemento pai de todas as rotas do portal em `src/routes/router.tsx` |
+| **Sidebar** | `components/layout/Sidebar.tsx` | Expandida (280px) / recolhida (80px, só ícones + Tooltip) | Sem props — lê `useSidebarStore`, `useVisibleMenu`, `useSessionStore` | Renderizado uma vez dentro de `AppShell` |
+| **Topbar** | `components/layout/Topbar.tsx` | Nenhuma | Sem props — lê `useTheme`, `useSessionStore`, `useSidebarStore` | Renderizado uma vez dentro de `AppShell` |
+| **AccountSwitcherMenu** | `components/layout/AccountSwitcherMenu.tsx` | Ancorado para baixo (topbar) ou para cima (rodapé da sidebar) | `trigger: ReactNode`, `align?: 'start'\|'end'\|'center'` (padrão `end`), `side?: 'top'\|'bottom'` (padrão `bottom`) | `<AccountSwitcherMenu trigger={<button>...</button>} side="top" align="start" />` |
+| **NotificationsPopover** | `components/layout/NotificationsPopover.tsx` | Nenhuma | Sem props — lista mockada interna | Usado dentro de `Topbar` |
+
+## 4. Arquitetura e RBAC — hooks/componentes de infraestrutura reutilizável
+
+Peças que não são "visuais" no mesmo sentido de `components/ui` — são utilitários de arquitetura pensados para qualquer módulo futuro (Cadastros, Financeiro, Comunicação etc.), não só o Dashboard onde foram introduzidos.
+
+### usePermission
 
 - **Caminho:** `src/hooks/usePermission.ts`
 - **Assinatura:** `usePermission(required: string | string[]): boolean`
@@ -19,7 +71,7 @@ const canManageAccount = usePermission(['configuracoes.geral', 'configuracoes.us
 ```
 - **Quando usar diretamente (em vez de `PermissionGate`):** quando o resultado da checagem também precisa alimentar outra decisão além de "renderizar ou não" — por exemplo, calcular classes de grid/`col-span` com base em quais itens de uma linha estão visíveis (ver `DashboardPage.tsx`, seção 4 de `docs/03-pagina-dashboard.md`).
 
-## 3. PermissionGate
+### PermissionGate
 
 - **Caminho:** `src/components/ui/permission-gate/PermissionGate.tsx`
 - **Props:** `permission: string | string[]`, `children: ReactNode`, `fallback?: ReactNode` (padrão `null`).
@@ -35,12 +87,12 @@ import { PermissionGate } from '@/components/ui';
   <Button variant="danger">Excluir</Button>
 </PermissionGate>
 ```
-- **Quando usar:** para condicionar um bloco isolado sem que o resultado precise influenciar layout externo a ele — é o padrão preferido para a maioria dos casos (ex.: cada `StatCard` individual dentro de `StatCardsGrid`, ver `src/modules/dashboard/components/StatCardsGrid.tsx`).
+- **Quando usar:** para condicionar um bloco isolado sem que o resultado precise influenciar layout externo a ele — é o padrão preferido para a maioria dos casos (ex.: cada `StatCard` individual dentro de `StatCardsGrid`).
 - **Exportado por:** `components/ui` (barrel), junto com os demais componentes do Design System.
 
-## 4. Convenção para novos módulos
+### Convenção para novos módulos
 
-Qualquer módulo novo que precise condicionar UI por permissão deve seguir o mesmo padrão usado no Dashboard (`src/modules/dashboard/dashboard.permissions.ts`):
+Qualquer módulo novo que precise condicionar UI por permissão segue o mesmo padrão usado no Dashboard (`src/modules/dashboard/dashboard.permissions.ts`):
 
 1. Declare um objeto `const` de permissões do módulo (`as const`), com uma chave por widget/ação — não strings soltas espalhadas pelo código.
 2. Inclua essas permissões nos mocks de conta relevantes (`src/lib/mock-accounts.ts`, `mockMemberships`) para que o comportamento seja demonstrável trocando de conta.
