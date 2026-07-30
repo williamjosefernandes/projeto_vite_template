@@ -4,7 +4,13 @@ import { AppShell } from '../components/layout/AppShell';
 import { menuConfig } from '../lib/menu-config';
 import { dsMenuItems } from '../lib/ds-menu-config';
 import { DashboardPage } from '../modules/dashboard/DashboardPage';
-import { DesignSystemComingSoonPage, DesignSystemLayout, TokensPage, VisaoGeralPage } from '../pages/design-system';
+import {
+  CoresPage,
+  DesignSystemComingSoonPage,
+  DesignSystemLayout,
+  TokensPage,
+  VisaoGeralPage,
+} from '../pages/design-system';
 import { PlaceholderPage } from '../pages/placeholder';
 
 const menuRoutes = menuConfig
@@ -15,6 +21,7 @@ const menuRoutes = menuConfig
 const dsContentByPath: Record<string, ReactNode> = {
   '/design-system/visao-geral': <VisaoGeralPage />,
   '/design-system/tokens': <TokensPage />,
+  '/design-system/cores': <CoresPage />,
 };
 
 const dsRoutes = dsMenuItems.map((item) => ({

@@ -53,6 +53,7 @@ npm run preview    # serve o build de produção localmente
 | [`07-como-criar-pagina-a-partir-de-print.md`](./07-como-criar-pagina-a-partir-de-print.md) | Guia passo a passo para pedir um módulo novo a partir de uma imagem de referência |
 | [`ds-00-estrutura-e-visao-geral.md`](./ds-00-estrutura-e-visao-geral.md) | Documentação viva do Design System (`/design-system`): estrutura da sidebar/topbar próprias, roteamento interno, página "Visão Geral" — **fonte visual de referência interna** do projeto |
 | [`ds-01-tokens.md`](./ds-01-tokens.md) | Página "Tokens" — espelho organizado de cor/tipografia/espaçamento/raio/sombra/borda/z-index/opacidade, mapeados para a escala real do Tailwind (não variáveis CSS nomeadas) |
+| [`ds-02-cores.md`](./ds-02-cores.md) | Página "Cores" — paleta completa com hex reais (primária, semânticas, neutras, apoio, gradientes, gráficos) e pares de contraste WCAG 2.1 calculados |
 
 Os documentos `04`, `05`, `06`, `07` e a série `ds-*` são **estruturais e permanentes** — não pertencem a uma fase específica e devem ser mantidos atualizados conforme o código evolui. Os documentos `00`–`03` (e os que vierem depois, um por módulo) são **registros de fase**: descrevem o que foi decidido e entregue em cada etapa, e não mudam retroativamente.
 
