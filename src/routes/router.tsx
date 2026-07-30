@@ -19,6 +19,7 @@ import {
   VisaoGeralPage,
 } from '../pages/design-system';
 import { PlaceholderPage } from '../pages/placeholder';
+import { LoginPage } from '../modules/auth/LoginPage';
 
 const menuRoutes = menuConfig
   .flatMap((group) => group.items)
@@ -55,6 +56,10 @@ const dsRoutes = dsMenuItems.map((item) => ({
  * respectivo prompt (DS-02 em diante) ser executado.
  */
 export const router = createBrowserRouter([
+  {
+    path: '/login',
+    element: <LoginPage />,
+  },
   {
     element: <AppShell />,
     children: [{ path: '/', element: <DashboardPage /> }, ...menuRoutes],
