@@ -8,6 +8,7 @@ import {
   CoresPage,
   DesignSystemComingSoonPage,
   DesignSystemLayout,
+  IconesPage,
   TipografiaPage,
   TokensPage,
   VisaoGeralPage,
@@ -24,6 +25,7 @@ const dsContentByPath: Record<string, ReactNode> = {
   '/design-system/tokens': <TokensPage />,
   '/design-system/cores': <CoresPage />,
   '/design-system/tipografia': <TipografiaPage />,
+  '/design-system/icones': <IconesPage />,
 };
 
 const dsRoutes = dsMenuItems.map((item) => ({

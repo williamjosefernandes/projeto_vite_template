@@ -55,6 +55,7 @@ npm run preview    # serve o build de produção localmente
 | [`ds-01-tokens.md`](./ds-01-tokens.md) | Página "Tokens" — espelho organizado de cor/tipografia/espaçamento/raio/sombra/borda/z-index/opacidade, mapeados para a escala real do Tailwind (não variáveis CSS nomeadas) |
 | [`ds-02-cores.md`](./ds-02-cores.md) | Página "Cores" — paleta completa com hex reais (primária, semânticas, neutras, apoio, gradientes, gráficos) e pares de contraste WCAG 2.1 calculados |
 | [`ds-03-tipografia.md`](./ds-03-tipografia.md) | Página "Tipografia" — escala tipográfica real do componente `Typography` (5 níveis: h1/h2/body/caption/kpi) |
+| [`ds-04-icones.md`](./ds-04-icones.md) | Página "Ícones" — catálogo de ícones `lucide-react` já em uso, por categoria, convenção de tamanho e `strokeWidth` |
 
 Os documentos `04`, `05`, `06`, `07` e a série `ds-*` são **estruturais e permanentes** — não pertencem a uma fase específica e devem ser mantidos atualizados conforme o código evolui. Os documentos `00`–`03` (e os que vierem depois, um por módulo) são **registros de fase**: descrevem o que foi decidido e entregue em cada etapa, e não mudam retroativamente.
 

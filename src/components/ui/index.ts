@@ -8,6 +8,8 @@ export * from './code-block';
 export * from './color-swatch';
 export * from './DropdownMenu';
 export * from './EmptyState';
+export * from './icon-tile';
+export * from './Input';
 export * from './Modal';
 export * from './permission-gate';
 export * from './Popover';
