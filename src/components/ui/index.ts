@@ -4,6 +4,7 @@ export * from './Badge';
 export * from './Button';
 export * from './Card';
 export * from './Checkbox';
+export * from './code-block';
 export * from './DropdownMenu';
 export * from './EmptyState';
 export * from './Modal';
