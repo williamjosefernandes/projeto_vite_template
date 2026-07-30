@@ -32,6 +32,7 @@ Cada componente vive em sua própria pasta com barrel export (`index.ts`); o bar
 | **IconTile** | `components/ui/icon-tile` | `size`: `xs`·`sm`·`md` (padrão)·`lg`·`xl`·`2xl` | `icon: LucideIcon`, `label?: string`, `strokeWidth?: number` (padrão `1.5`) | `<IconTile icon={Home} label="home" />` |
 | **Input** | `components/ui/Input` | Nenhuma | Todas as props nativas de `<input>` | `<Input placeholder="Buscar..." value={v} onChange={e => setV(e.target.value)} />` |
 | **Skeleton** | `components/ui/Skeleton` | Nenhuma | Props nativas de `<div>`; largura/altura via `className` | `<Skeleton className="h-4 w-1/3" />` |
+| **SpacingBar** | `components/ui/spacing-bar` | Nenhuma | `px: number`, `maxPx: number` (normaliza a largura proporcional) | `<SpacingBar px={24} maxPx={128} />` |
 | **Toast (Toaster)** | `components/ui/Toast` | 4 tipos via função (`success`/`error`/`info`/`warning`) | Montado uma vez em `src/main.tsx`; disparado via `toast` de `sonner` (não reimportar `Toaster`) | `toast.success('Registro salvo com sucesso.')` |
 | **Typography** | `components/ui/Typography` | `variant`: `h1` · `h2` · `body` (padrão) · `caption` · `kpi` — ver tabela de tipografia em `docs/04-design-tokens.md` | `variant`, `as?: ElementType` (sobrescreve a tag), `className?` | `<Typography variant="h1">Bom dia, William</Typography>` |
 | **PermissionGate** | `components/ui/permission-gate` | Nenhuma | `permission: string \| string[]`, `children`, `fallback?` (padrão `null`) | Ver seção 4 (Arquitetura e RBAC) abaixo |

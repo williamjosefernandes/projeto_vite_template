@@ -16,6 +16,7 @@ export * from './Popover';
 export * from './Radio';
 export * from './Select';
 export * from './Skeleton';
+export * from './spacing-bar';
 export * from './StatCard';
 export * from './Switch';
 export * from './Table';
