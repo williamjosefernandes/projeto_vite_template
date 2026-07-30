@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Lock, Mail, ShieldCheck } from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail, ShieldCheck, UserPlus } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { CheckboxField } from '../../components/ui/Checkbox';
@@ -110,7 +110,15 @@ export function LoginPage() {
           <div className="h-px flex-1 bg-gray-200 dark:bg-gray-800" />
         </div>
 
-        <p className="flex items-start gap-2 text-xs text-gray-500 dark:text-gray-400">
+        <Link
+          to="/cadastro"
+          className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white text-sm font-medium text-violet-700 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-violet-400 dark:hover:bg-gray-800"
+        >
+          <UserPlus className="h-4 w-4" />
+          Criar minha conta
+        </Link>
+
+        <p className="mt-6 flex items-start gap-2 text-xs text-gray-500 dark:text-gray-400">
           <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-violet-600 dark:text-violet-400" />
           <span>
             Ao continuar, você concorda com nossos{' '}
