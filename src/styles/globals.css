@@ -1,0 +1,11 @@
+@import 'tailwindcss';
+
+/* Tailwind v4 usa media query prefers-color-scheme por padrão para `dark:`.
+   Este projeto controla o tema via classe `.dark` na tag <html> (ver useTheme),
+   então redefinimos a variante para reagir à classe em vez da media query. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans:
+    'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+}
