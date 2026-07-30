@@ -5,6 +5,7 @@ import {
   LandPlot,
   Trophy,
 } from 'lucide-react';
+import { DASHBOARD_PERMISSIONS, STAT_CARD_PERMISSIONS } from '../modules/dashboard/dashboard.permissions';
 import type { Account, AccountMembership } from '../types/rbac';
 
 /**
@@ -51,12 +52,16 @@ export const mockAccounts: Account[] = [
 ];
 
 /**
- * Permissões por conta. Cada conta enxerga um recorte diferente do menu:
- * - soulnstrutor: acesso total (todos os módulos, referência do print).
- * - madecoders: sem módulo Operações nem Marketing.
- * - esporty-cup: só Cadastros + Comunicação (sem Financeiro).
- * - esporty-arena: Financeiro + Operações, sem Cadastros nem Marketing.
- * - esporty-academy: apenas navegação básica, nenhum módulo.
+ * Permissões por conta. Cada conta enxerga um recorte diferente do menu
+ * (Etapa 3) e, dentro do Dashboard, um recorte diferente de widgets (Etapa 6):
+ * - soulnstrutor (Administrador): acesso total — todos os módulos, todos os widgets e StatCards.
+ * - madecoders (Atendente): StatCards "Novos Clientes" e "Aulas Agendadas", "Atividades recentes"
+ *   e "Agenda de Hoje" — sem "Resumo financeiro" nem "Top Produtos".
+ * - esporty-cup (Financeiro): StatCard "Receita do Mês", "Resumo financeiro" e "Top Produtos /
+ *   Serviços" — sem "Agenda de Hoje" nem "Notificações".
+ * - esporty-arena: Financeiro + Operações no menu, sem nenhuma permissão de widget de dashboard
+ *   (demonstra o `EmptyState` de "nenhum widget visível").
+ * - esporty-academy: apenas navegação básica, nenhum módulo, nenhum widget de dashboard.
  */
 export const mockMemberships: AccountMembership[] = [
   {
@@ -81,6 +86,17 @@ export const mockMemberships: AccountMembership[] = [
       'marketing.promocoes',
       'configuracoes.geral',
       'configuracoes.usuarios',
+      DASHBOARD_PERMISSIONS.statCards,
+      DASHBOARD_PERMISSIONS.performanceChart,
+      DASHBOARD_PERMISSIONS.recentActivities,
+      DASHBOARD_PERMISSIONS.todayAgenda,
+      DASHBOARD_PERMISSIONS.notifications,
+      DASHBOARD_PERMISSIONS.topProducts,
+      DASHBOARD_PERMISSIONS.financialSummary,
+      STAT_CARD_PERMISSIONS.receitaDoMes,
+      STAT_CARD_PERMISSIONS.novosClientes,
+      STAT_CARD_PERMISSIONS.aulasAgendadas,
+      STAT_CARD_PERMISSIONS.conversoes,
     ],
   },
   {
@@ -97,6 +113,11 @@ export const mockMemberships: AccountMembership[] = [
       'comunicacao.mensagens',
       'configuracoes.geral',
       'configuracoes.usuarios',
+      DASHBOARD_PERMISSIONS.statCards,
+      DASHBOARD_PERMISSIONS.recentActivities,
+      DASHBOARD_PERMISSIONS.todayAgenda,
+      STAT_CARD_PERMISSIONS.novosClientes,
+      STAT_CARD_PERMISSIONS.aulasAgendadas,
     ],
   },
   {
@@ -109,6 +130,10 @@ export const mockMemberships: AccountMembership[] = [
       'comunicacao.mensagens',
       'comunicacao.notificacoes',
       'configuracoes.geral',
+      DASHBOARD_PERMISSIONS.statCards,
+      DASHBOARD_PERMISSIONS.topProducts,
+      DASHBOARD_PERMISSIONS.financialSummary,
+      STAT_CARD_PERMISSIONS.receitaDoMes,
     ],
   },
   {

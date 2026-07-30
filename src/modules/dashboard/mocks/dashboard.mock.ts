@@ -7,6 +7,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { moduleColors } from '../../../lib/module-colors';
+import { STAT_CARD_PERMISSIONS } from '../dashboard.permissions';
 
 export interface StatCardData {
   id: string;
@@ -16,6 +17,7 @@ export interface StatCardData {
   deltaLabel: string;
   icon: LucideIcon;
   iconColorClass: string;
+  requiredPermission: string;
 }
 
 export const statCardsMock: StatCardData[] = [
@@ -27,6 +29,7 @@ export const statCardsMock: StatCardData[] = [
     deltaLabel: 'vs mês anterior',
     icon: CreditCard,
     iconColorClass: 'bg-violet-100 text-violet-600 dark:bg-violet-900/30 dark:text-violet-400',
+    requiredPermission: STAT_CARD_PERMISSIONS.receitaDoMes,
   },
   {
     id: 'novos-clientes',
@@ -36,6 +39,7 @@ export const statCardsMock: StatCardData[] = [
     deltaLabel: 'vs mês anterior',
     icon: UserPlus,
     iconColorClass: moduleColors.financeiro.iconClassName,
+    requiredPermission: STAT_CARD_PERMISSIONS.novosClientes,
   },
   {
     id: 'aulas-agendadas',
@@ -45,6 +49,7 @@ export const statCardsMock: StatCardData[] = [
     deltaLabel: 'vs mês anterior',
     icon: Calendar,
     iconColorClass: moduleColors.comunicacao.iconClassName,
+    requiredPermission: STAT_CARD_PERMISSIONS.aulasAgendadas,
   },
   {
     id: 'conversoes',
@@ -54,6 +59,7 @@ export const statCardsMock: StatCardData[] = [
     deltaLabel: 'vs mês anterior',
     icon: ShoppingCart,
     iconColorClass: moduleColors.cadastros.iconClassName,
+    requiredPermission: STAT_CARD_PERMISSIONS.conversoes,
   },
 ];
 

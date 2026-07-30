@@ -70,7 +70,56 @@ Todos recebem os dados já prontos via props (sem lógica de mock/formatação d
 3. Nenhum componente em `components/` muda — todos recebem os mesmos tipos (`StatCardData[]`, `ActivityData[]`, etc.) vindos de `mocks/dashboard.mock.ts` hoje, e da API depois.
 4. Estados de loading/erro por seção podem ser tratados dentro de `useDashboardData` (ex.: retornando arrays vazios enquanto carrega) ou propagados para `DashboardPage` decidir — não foi necessário nesta etapa por não haver requisições reais.
 
-## 4. Referência visual usada
+## 4. Permissões por widget
+
+Cada bloco do Dashboard só é renderizado se a conta ativa (`useSessionStore.permissions`) tiver a permissão correspondente. A checagem é reativa: trocar de conta no `AccountSwitcherMenu` (Etapa 3) reorganiza o dashboard instantaneamente, sem reload.
+
+### Onde ficam as permissões
+`src/modules/dashboard/dashboard.permissions.ts` define dois conjuntos:
+
+| Constante | Widget | Permissão |
+|---|---|---|
+| `DASHBOARD_PERMISSIONS.statCards` | Seção de StatCards (grid inteiro) | `dashboard.indicadores.visualizar` |
+| `DASHBOARD_PERMISSIONS.performanceChart` | Card "Desempenho" | `dashboard.desempenho.visualizar` |
+| `DASHBOARD_PERMISSIONS.recentActivities` | Card "Atividades recentes" | `dashboard.atividades.visualizar` |
+| `DASHBOARD_PERMISSIONS.todayAgenda` | Card "Agenda de Hoje" | `dashboard.agenda.visualizar` |
+| `DASHBOARD_PERMISSIONS.notifications` | Card "Notificações" | `dashboard.notificacoes.visualizar` |
+| `DASHBOARD_PERMISSIONS.topProducts` | "Top Produtos / Serviços" | `dashboard.top_produtos.visualizar` |
+| `DASHBOARD_PERMISSIONS.financialSummary` | "Resumo financeiro" | `dashboard.financeiro.visualizar` |
+
+| Constante | StatCard | Permissão |
+|---|---|---|
+| `STAT_CARD_PERMISSIONS.receitaDoMes` | Receita do Mês | `dashboard.indicadores.receita` |
+| `STAT_CARD_PERMISSIONS.novosClientes` | Novos Clientes | `dashboard.indicadores.novos_clientes` |
+| `STAT_CARD_PERMISSIONS.aulasAgendadas` | Aulas Agendadas | `dashboard.indicadores.aulas_agendadas` |
+| `STAT_CARD_PERMISSIONS.conversoes` | Conversões | `dashboard.indicadores.conversoes` |
+
+Cada StatCard mockado em `dashboard.mock.ts` carrega seu `requiredPermission` (um dos valores de `STAT_CARD_PERMISSIONS`); `StatCardsGrid` filtra a lista recebida antes de renderizar — um usuário pode ver "Novos Clientes" e "Aulas Agendadas" sem ver "Receita do Mês", mesmo tendo acesso à seção `statCards` como um todo.
+
+### Como a checagem funciona
+- `src/hooks/usePermission.ts`: hook que recebe uma permissão (ou lista) e retorna `boolean`, lendo `useSessionStore.permissions` — reavalia automaticamente a cada troca de conta.
+- `src/components/ui/permission-gate/PermissionGate.tsx`: componente de guarda declarativo (`<PermissionGate permission={...}>...</PermissionGate>`) que envolve `usePermission` para os casos em que não é preciso decidir layout — só mostrar/ocultar um bloco isolado. É o padrão usado dentro de `StatCardsGrid` para cada StatCard individual.
+- Em `DashboardPage.tsx`, as permissões de seção são lidas diretamente via `usePermission` (não via `PermissionGate`) porque o resultado também precisa alimentar o cálculo de layout do grid (ver abaixo) — usar `PermissionGate` ali exigiria checar a mesma permissão duas vezes (uma para renderizar, outra para decidir `col-span`).
+
+### Como o grid se reorganiza sem buracos
+- **StatCards:** `visibleStats` é a lista já filtrada por permissão; `StatCardsGrid` só recebe os itens visíveis e o CSS Grid (`grid-cols-4`) reacomoda sozinho — sem posições fixas por índice, não sobra espaço vazio onde um card foi ocultado.
+- **Linha "Desempenho + Atividades recentes" e linha "Top Produtos + Resumo financeiro":** ambas usam o mesmo componente auxiliar `CollapsingTwoColRow` (interno a `DashboardPage.tsx`). Ele recebe `left`/`right` (cada um `ReactNode | false`) e decide: se os dois estão presentes, mantém `md:grid-cols-2`; se só um está presente, esse item ganha `md:col-span-2` (ocupa a linha toda); se nenhum está presente, a linha inteira retorna `null`.
+- **Coluna principal vs. coluna lateral:** `showMainColumn` (verdadeiro se qualquer um entre Desempenho/Atividades/Top Produtos/Resumo financeiro for visível) e `showSidebarColumn` (Agenda ou Notificações) controlam `lg:col-span-2`/`lg:col-span-3`/ausência total de cada coluna — se só a lateral estiver visível, a coluna principal desaparece e a lateral ocupa o espaço; se nenhuma das duas, a `<div>` externa da linha nem é renderizada.
+- **Seção inteira oculta:** cada `if (!left && !right) return null` (dentro de `CollapsingTwoColRow`) e os `{condição && <div>...}` em `DashboardPage` garantem que uma seção sem nenhum widget visível não deixa `<div>` vazia no DOM — não há whitespace/borda fantasma.
+- **Zero widgets no dashboard inteiro:** `hasAnyWidgetVisible` (StatCards visíveis OU coluna principal OU coluna lateral) decide entre renderizar o dashboard normal ou um `EmptyState` (`components/ui/EmptyState`, Etapa 2) com o título "Nenhum item disponível" e a mensagem "Você não tem permissão para visualizar nenhum item deste dashboard nesta conta. Fale com o administrador da conta para solicitar acesso."
+
+### Mock de contas usado para demonstrar
+Estendido em `src/lib/mock-accounts.ts` (`mockMemberships`), reaproveitando as 5 contas da Etapa 3:
+
+| Conta (mock) | Papel | Widgets visíveis |
+|---|---|---|
+| SoulInstrutor | Administrador | Todos os widgets e todos os StatCards |
+| MadeCoders | Atendente | StatCards "Novos Clientes" e "Aulas Agendadas"; "Atividades recentes"; "Agenda de Hoje" — sem "Resumo financeiro" nem "Top Produtos" |
+| Esporty Cup | Financeiro | StatCard "Receita do Mês"; "Resumo financeiro"; "Top Produtos / Serviços" — sem "Agenda de Hoje" nem "Notificações" |
+| Esporty Arena | — | Nenhuma permissão de dashboard — usada para demonstrar o `EmptyState` |
+| Esporty Academy | — | Nenhuma permissão de dashboard |
+
+## 5. Referência visual usada
 
 O print de referência mostrava um dashboard de painel administrativo ("Sua Marca — Painel de Controle", persona "Vicente Pires / Administrador") com:
 - Cabeçalho com saudação, seletor de período (`23 - 29 de jul, 2025`) e botão "+ Ação rápida".
@@ -81,10 +130,11 @@ O print de referência mostrava um dashboard de painel administrativo ("Sua Marc
 - Rodapé com copyright.
 - Reproduzido tanto em tema claro quanto escuro, com a sidebar/topbar da Etapa 3 ao redor.
 
-## 5. Entregável verificado
+## 6. Entregável verificado
 
 - `npx tsc -b` sem erros de tipagem.
 - `npm run lint` (oxlint) sem avisos novos além dos já aceitos (compound components da Etapa 2).
 - Testado via Playwright headless em `/` (light e dark): todos os 8 cards renderizando com os dados mockados corretos, `Select` de período e dropdown "Ação rápida" abrindo normalmente, sparkline e gráfico de área renderizando nas cores certas em ambos os temas.
 - Bug encontrado e corrigido durante a verificação: eixo Y do gráfico "Desempenho" cortava os ticks de 4 dígitos (mostrava `"00"` em vez de `"8000"`); corrigido com `tickFormatter` exibindo os valores em milhares (`2k`–`8k`), que também é mais fiel à referência visual.
+- RBAC de dashboard testado trocando entre as 5 contas do mock: Administrador (todos os widgets), Atendente (2 StatCards + Atividades + Agenda, colunas colapsando sem buraco), Financeiro (1 StatCard + Top Produtos + Resumo financeiro, coluna lateral inteira ausente) e as duas contas sem permissão de dashboard (`EmptyState` renderizado). Nenhuma seção deixou espaço vazio/whitespace ao ocultar widgets.
 - Sem erros de console/pageerror nas capturas.

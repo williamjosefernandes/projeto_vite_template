@@ -5,6 +5,7 @@ export * from './Card';
 export * from './DropdownMenu';
 export * from './EmptyState';
 export * from './Modal';
+export * from './permission-gate';
 export * from './Popover';
 export * from './Select';
 export * from './Skeleton';
