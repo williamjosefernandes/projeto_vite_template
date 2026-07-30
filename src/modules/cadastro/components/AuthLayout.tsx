@@ -12,10 +12,21 @@ export interface AuthLayoutProps {
   supportText: string;
   /** Terceiro item de destaque — descrição muda entre a tela de seleção e o wizard. */
   thirdHighlightDescription: string;
-  /** Badge "Tipo de conta selecionado" — omitido na tela de seleção (Step 0). */
+  /** Badge "Tipo de conta selecionado" — omitido na tela de seleção (Step 0) e no login. */
   accountTypeBadge?: ReactNode;
+  /** Link de apoio no canto superior direito (ex.: "Já tem uma conta?" vs. "Não tem conta?"). */
+  headerLink?: ReactNode;
   children: ReactNode;
 }
+
+const defaultHeaderLink = (
+  <p className="text-sm text-gray-500 dark:text-gray-400">
+    Já tem uma conta?{' '}
+    <Link to="/login" className="font-medium text-violet-700 hover:underline dark:text-violet-400">
+      Fazer login
+    </Link>
+  </p>
+);
 
 /**
  * Casca das telas de cadastro/autenticação: painel esquerdo fixo (~38-40%,
@@ -23,7 +34,13 @@ export interface AuthLayoutProps {
  * `h-screen`, sem scroll na página — cada step controla seu próprio
  * scroll interno se o conteúdo for maior que a viewport.
  */
-export function AuthLayout({ supportText, thirdHighlightDescription, accountTypeBadge, children }: AuthLayoutProps) {
+export function AuthLayout({
+  supportText,
+  thirdHighlightDescription,
+  accountTypeBadge,
+  headerLink = defaultHeaderLink,
+  children,
+}: AuthLayoutProps) {
   return (
     <div className="flex h-screen overflow-hidden bg-white dark:bg-gray-950">
       <div className="relative hidden w-[38%] shrink-0 flex-col justify-between overflow-hidden bg-gradient-to-br from-indigo-950 via-indigo-800 to-violet-700 p-10 text-white lg:flex">
@@ -81,12 +98,7 @@ export function AuthLayout({ supportText, thirdHighlightDescription, accountType
       <div className="flex flex-1 flex-col overflow-y-auto">
         <div className="flex items-center justify-between px-6 pt-6 lg:px-16">
           <div>{accountTypeBadge}</div>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            Já tem uma conta?{' '}
-            <Link to="/login" className="font-medium text-violet-700 hover:underline dark:text-violet-400">
-              Fazer login
-            </Link>
-          </p>
+          {headerLink}
         </div>
         <div className="flex flex-1 flex-col justify-center px-6 py-8 lg:px-16">{children}</div>
       </div>
