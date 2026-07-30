@@ -6,4 +6,7 @@ export { TipografiaPage } from './pages/TipografiaPage';
 export { IconesPage } from './pages/IconesPage';
 export { EspacamentoPage } from './pages/EspacamentoPage';
 export { SombrasPage } from './pages/SombrasPage';
+export { BordasPage } from './pages/BordasPage';
+export { RadiosPage } from './pages/RadiosPage';
+export { CheckboxPage } from './pages/CheckboxPage';
 export { DesignSystemComingSoonPage } from './pages/DesignSystemComingSoonPage';

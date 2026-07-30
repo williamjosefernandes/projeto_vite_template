@@ -106,7 +106,7 @@ export const dsMenuGroups: DesignSystemMenuGroup[] = [
       {
         id: 'radios',
         label: 'Radios',
-        description: 'Escala de raios de borda aplicada a botões, inputs e cards.',
+        description: 'Seleção única entre opções mutuamente exclusivas.',
         icon: Circle,
         path: `${BASE_PATH}/radios`,
       },

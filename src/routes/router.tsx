@@ -5,11 +5,14 @@ import { menuConfig } from '../lib/menu-config';
 import { dsMenuItems } from '../lib/ds-menu-config';
 import { DashboardPage } from '../modules/dashboard/DashboardPage';
 import {
+  BordasPage,
+  CheckboxPage,
   CoresPage,
   DesignSystemComingSoonPage,
   DesignSystemLayout,
   EspacamentoPage,
   IconesPage,
+  RadiosPage,
   SombrasPage,
   TipografiaPage,
   TokensPage,
@@ -30,6 +33,9 @@ const dsContentByPath: Record<string, ReactNode> = {
   '/design-system/icones': <IconesPage />,
   '/design-system/espacamento': <EspacamentoPage />,
   '/design-system/sombras': <SombrasPage />,
+  '/design-system/bordas': <BordasPage />,
+  '/design-system/radios': <RadiosPage />,
+  '/design-system/checkbox': <CheckboxPage />,
 };
 
 const dsRoutes = dsMenuItems.map((item) => ({

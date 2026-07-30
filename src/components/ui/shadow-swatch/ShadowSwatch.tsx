@@ -22,7 +22,7 @@ export function ShadowSwatch({
 }: ShadowSwatchProps) {
   return (
     <div ref={ref} className={cn('text-left', className)} {...props}>
-      <div className={cn('h-24 w-full rounded-lg border border-gray-100 bg-white dark:border-gray-800 dark:bg-gray-900', shadowClassName)} />
+      <div className={cn('h-24 w-full rounded-lg border border-gray-100 bg-white', shadowClassName)} />
       <p className="mt-3 text-sm font-semibold text-violet-700 dark:text-violet-400">{label}</p>
       {description && <p className="text-xs text-gray-500 dark:text-gray-400">{description}</p>}
       {value && <p className="mt-1 font-mono text-[11px] leading-tight text-gray-400">{value}</p>}

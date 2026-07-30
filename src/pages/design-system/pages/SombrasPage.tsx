@@ -114,12 +114,12 @@ export function SombrasPage() {
                 <div key={s.label}>
                   <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{s.label}</p>
                   <p className="font-mono text-[11px] text-gray-400">{s.token}</p>
-                  <div className={`mt-2 rounded-xl border border-gray-100 bg-white p-4 dark:border-gray-800 dark:bg-gray-900 ${s.className}`}>
-                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-violet-50 text-violet-600 dark:bg-violet-900/30 dark:text-violet-400">
+                  <div className={`mt-2 rounded-xl border border-gray-100 bg-white p-4 ${s.className}`}>
+                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-violet-50 text-violet-600">
                       <s.icon className="h-4 w-4" strokeWidth={1.5} />
                     </span>
-                    <p className="mt-3 text-sm font-semibold text-gray-900 dark:text-gray-100">{s.name}</p>
-                    <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">{s.description}</p>
+                    <p className="mt-3 text-sm font-semibold text-gray-900">{s.name}</p>
+                    <p className="mt-0.5 text-xs text-gray-500">{s.description}</p>
                   </div>
                 </div>
               ))}
@@ -164,7 +164,7 @@ export function SombrasPage() {
             <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3">
               {coloredShadows.map((s) => (
                 <div key={s.token}>
-                  <div className={`h-16 w-full rounded-lg border border-gray-100 bg-white dark:border-gray-800 dark:bg-gray-900 ${s.className}`} />
+                  <div className={`h-16 w-full rounded-lg border border-gray-100 bg-white ${s.className}`} />
                   <p className={`mt-2 text-xs font-semibold ${s.textClass}`}>{s.label}</p>
                   <p className="font-mono text-[10px] text-gray-400">{s.value}</p>
                 </div>
@@ -184,7 +184,7 @@ export function SombrasPage() {
             <div className="mt-4 grid grid-cols-2 gap-4">
               {insetShadows.map((s) => (
                 <div key={s.token}>
-                  <div className={`h-16 w-full rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900 ${s.className}`} />
+                  <div className={`h-16 w-full rounded-lg border border-gray-200 bg-white ${s.className}`} />
                   <p className="mt-2 text-xs font-semibold text-gray-700 dark:text-gray-200">{s.token}</p>
                   <p className="font-mono text-[10px] leading-tight text-gray-400">{s.value}</p>
                 </div>
