@@ -20,3 +20,22 @@
 .dark .sidebar-scroll::-webkit-scrollbar-thumb {
   background: theme('colors.gray.700');
 }
+
+/* Sombras coloridas — uso especial (estados de destaque/feedback), não fazem
+   parte da escala neutra padrão do Tailwind. Cor base = mesma escala 600 já
+   usada nos badges/botões semânticos (ver docs/04-design-tokens.md §2). */
+.shadow-primary {
+  box-shadow: 0 10px 30px -10px rgb(127 34 254 / 0.25);
+}
+.shadow-success {
+  box-shadow: 0 10px 30px -10px rgb(0 166 62 / 0.2);
+}
+.shadow-warning {
+  box-shadow: 0 10px 30px -10px rgb(225 113 0 / 0.2);
+}
+.shadow-danger {
+  box-shadow: 0 10px 30px -10px rgb(231 0 11 / 0.2);
+}
+.shadow-info {
+  box-shadow: 0 10px 30px -10px rgb(21 93 252 / 0.2);
+}

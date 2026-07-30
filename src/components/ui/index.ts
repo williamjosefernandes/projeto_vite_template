@@ -15,6 +15,7 @@ export * from './permission-gate';
 export * from './Popover';
 export * from './Radio';
 export * from './Select';
+export * from './shadow-swatch';
 export * from './Skeleton';
 export * from './spacing-bar';
 export * from './StatCard';

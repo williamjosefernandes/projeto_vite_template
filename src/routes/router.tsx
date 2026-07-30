@@ -10,6 +10,7 @@ import {
   DesignSystemLayout,
   EspacamentoPage,
   IconesPage,
+  SombrasPage,
   TipografiaPage,
   TokensPage,
   VisaoGeralPage,
@@ -28,6 +29,7 @@ const dsContentByPath: Record<string, ReactNode> = {
   '/design-system/tipografia': <TipografiaPage />,
   '/design-system/icones': <IconesPage />,
   '/design-system/espacamento': <EspacamentoPage />,
+  '/design-system/sombras': <SombrasPage />,
 };
 
 const dsRoutes = dsMenuItems.map((item) => ({

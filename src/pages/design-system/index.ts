@@ -5,4 +5,5 @@ export { CoresPage } from './pages/CoresPage';
 export { TipografiaPage } from './pages/TipografiaPage';
 export { IconesPage } from './pages/IconesPage';
 export { EspacamentoPage } from './pages/EspacamentoPage';
+export { SombrasPage } from './pages/SombrasPage';
 export { DesignSystemComingSoonPage } from './pages/DesignSystemComingSoonPage';
