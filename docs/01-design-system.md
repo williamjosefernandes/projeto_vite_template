@@ -66,6 +66,18 @@ import { Card } from '@/components/ui';
 </Card>
 ```
 
+### Avatar
+- **Caminho:** `components/ui/Avatar` (wrapper de `@radix-ui/react-avatar`) — adicionado na Etapa 3 (AppShell) para o card de usuário da Sidebar/Topbar, mas é reutilizável em qualquer tela.
+- **Subcomponentes:** `Avatar` (`Root`, `h-9 w-9 rounded-full`), `Avatar.Image`, `Avatar.Fallback` (iniciais sobre fundo `bg-violet-100`/`dark:bg-violet-900/30`).
+```tsx
+import { Avatar } from '@/components/ui';
+
+<Avatar>
+  <Avatar.Image src="/avatar.jpg" alt="Vicente Pires" />
+  <Avatar.Fallback>V</Avatar.Fallback>
+</Avatar>
+```
+
 ### Badge
 - **Caminho:** `components/ui/Badge`
 - **Props principais:** props nativas de `<span>` + `variant`.
