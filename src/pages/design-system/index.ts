@@ -9,4 +9,6 @@ export { SombrasPage } from './pages/SombrasPage';
 export { BordasPage } from './pages/BordasPage';
 export { RadiosPage } from './pages/RadiosPage';
 export { CheckboxPage } from './pages/CheckboxPage';
+export { LayoutPage } from './pages/LayoutPage';
+export { NavegacaoPage } from './pages/NavegacaoPage';
 export { DesignSystemComingSoonPage } from './pages/DesignSystemComingSoonPage';

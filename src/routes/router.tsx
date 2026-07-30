@@ -12,6 +12,8 @@ import {
   DesignSystemLayout,
   EspacamentoPage,
   IconesPage,
+  LayoutPage as DsLayoutPage,
+  NavegacaoPage,
   RadiosPage,
   SombrasPage,
   TipografiaPage,
@@ -20,6 +22,7 @@ import {
 } from '../pages/design-system';
 import { PlaceholderPage } from '../pages/placeholder';
 import { LoginPage } from '../modules/auth/LoginPage';
+import { CadastroPage } from '../modules/cadastro/CadastroPage';
 
 const menuRoutes = menuConfig
   .flatMap((group) => group.items)
@@ -37,6 +40,8 @@ const dsContentByPath: Record<string, ReactNode> = {
   '/design-system/bordas': <BordasPage />,
   '/design-system/radios': <RadiosPage />,
   '/design-system/checkbox': <CheckboxPage />,
+  '/design-system/layout': <DsLayoutPage />,
+  '/design-system/navegacao': <NavegacaoPage />,
 };
 
 const dsRoutes = dsMenuItems.map((item) => ({
@@ -59,6 +64,10 @@ export const router = createBrowserRouter([
   {
     path: '/login',
     element: <LoginPage />,
+  },
+  {
+    path: '/cadastro',
+    element: <CadastroPage />,
   },
   {
     element: <AppShell />,

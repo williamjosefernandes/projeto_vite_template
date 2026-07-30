@@ -1,121 +1,175 @@
 import { useState } from 'react';
+import type { FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Lock, Mail, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail, ShieldCheck, ShieldCheckIcon, Sparkles, Zap } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
+import { CheckboxField } from '../../components/ui/Checkbox';
+import { Typography } from '../../components/ui/Typography';
+
+const highlights = [
+  {
+    icon: ShieldCheck,
+    title: 'Seguro e confiável',
+    description: 'Seus dados sempre protegidos',
+  },
+  {
+    icon: Zap,
+    title: 'Rápido e eficiente',
+    description: 'Performance que impulsiona',
+  },
+  {
+    icon: Sparkles,
+    title: 'Consistente e escalável',
+    description: 'Padrões que facilitam a evolução',
+  },
+];
 
 export function LoginPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = (e: FormEvent) => {
     e.preventDefault();
-    // Simulate login and redirect to dashboard
     navigate('/');
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50/50 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-50 via-white to-white p-4 dark:from-slate-900 dark:via-slate-950 dark:to-slate-950">
-      <div className="w-full max-w-md overflow-hidden rounded-3xl bg-white/80 shadow-2xl shadow-blue-900/5 ring-1 ring-gray-900/5 backdrop-blur-xl dark:bg-slate-900/80 dark:shadow-blue-900/20 dark:ring-white/10">
-        <div className="p-8 sm:p-10">
-          <div className="mb-10 text-center">
-            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 text-white shadow-lg shadow-blue-500/30">
-              <ShieldCheck className="h-8 w-8" />
+    <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4 dark:bg-gray-950">
+      <div className="grid w-full max-w-4xl overflow-hidden rounded-2xl bg-white shadow-lg md:grid-cols-2 dark:bg-gray-900">
+        <div className="relative hidden flex-col justify-between overflow-hidden bg-violet-700 p-10 text-white md:flex">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -top-16 -left-16 h-64 w-64 rounded-full bg-white/10"
+          />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute right-8 top-10 h-2 w-2 rounded-full bg-white/30"
+          />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute bottom-24 -right-10 h-56 w-56 rounded-full bg-white/10"
+          />
+
+          <div className="relative flex flex-1 flex-col items-center justify-center text-center">
+            <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/20">
+              <ShieldCheckIcon className="h-10 w-10 text-white" />
             </div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">
-              Bem-vindo de volta
-            </h1>
-            <p className="mt-3 text-sm text-gray-500 dark:text-gray-400">
-              Insira suas credenciais para acessar sua conta
+            <p className="text-2xl font-bold tracking-wide uppercase">Sua Marca</p>
+            <p className="mt-1 text-violet-200">Design System</p>
+            <div className="mt-4 h-1 w-10 rounded-full bg-violet-300" />
+            <p className="mt-6 max-w-xs text-sm text-violet-100">
+              Um sistema completo para construir produtos digitais consistentes, acessíveis e de alta
+              qualidade.
             </p>
+
+            <div className="mt-10 w-full max-w-xs space-y-4 text-left">
+              {highlights.map(({ icon: Icon, title, description }) => (
+                <div key={title} className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white/10 ring-1 ring-white/20">
+                    <Icon className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold">{title}</p>
+                    <p className="text-xs text-violet-200">{description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-
-          <form onSubmit={handleLogin} className="space-y-6">
-            <div className="space-y-5">
-              <div className="space-y-2">
-                <label
-                  htmlFor="email"
-                  className="text-sm font-medium leading-none text-gray-700 peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:text-gray-300"
-                >
-                  E-mail
-                </label>
-                <div className="relative">
-                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                    <Mail className="h-5 w-5 text-gray-400 transition-colors group-focus-within:text-blue-500" />
-                  </div>
-                  <Input
-                    id="email"
-                    type="email"
-                    required
-                    placeholder="voce@exemplo.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10 h-11 transition-all duration-200 hover:border-blue-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <label
-                    htmlFor="password"
-                    className="text-sm font-medium leading-none text-gray-700 peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:text-gray-300"
-                  >
-                    Senha
-                  </label>
-                  <a
-                    href="#"
-                    className="text-sm font-medium text-blue-600 transition-colors hover:text-blue-500 dark:text-blue-400"
-                  >
-                    Esqueceu a senha?
-                  </a>
-                </div>
-                <div className="relative group">
-                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                    <Lock className="h-5 w-5 text-gray-400 transition-colors group-focus-within:text-blue-500" />
-                  </div>
-                  <Input
-                    id="password"
-                    type="password"
-                    required
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 h-11 transition-all duration-200 hover:border-blue-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center">
-              <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer hover:text-gray-900 transition-colors dark:text-gray-400 dark:hover:text-gray-200">
-                <input
-                  type="checkbox"
-                  className="h-4 w-4 rounded border-gray-300 text-blue-600 transition focus:ring-blue-500 dark:border-gray-600 dark:bg-slate-800"
-                />
-                Lembrar de mim por 30 dias
-              </label>
-            </div>
-
-            <Button
-              type="submit"
-              className="group w-full h-11 text-base font-medium shadow-md shadow-blue-500/20 transition-all hover:shadow-lg hover:shadow-blue-500/30"
-            >
-              Entrar
-              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-            </Button>
-          </form>
         </div>
 
-        <div className="border-t border-gray-100 bg-gray-50/50 px-8 py-5 text-center text-sm text-gray-600 dark:border-slate-800 dark:bg-slate-900/50 dark:text-gray-400">
-          Não tem uma conta?{' '}
-          <a
-            href="#"
-            className="font-semibold text-blue-600 transition-colors hover:text-blue-500 dark:text-blue-400"
-          >
-            Crie sua conta agora
-          </a>
+        <div className="flex flex-col justify-center p-8 sm:p-12">
+          <Typography variant="h1" className="text-2xl">
+            Bem-vindo de volta! 👋
+          </Typography>
+          <Typography className="mt-1">Faça login para acessar sua conta</Typography>
+
+          <form onSubmit={handleLogin} className="mt-8 space-y-5">
+            <div className="space-y-1.5">
+              <label htmlFor="email" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                E-mail
+              </label>
+              <div className="relative">
+                <Mail className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                <Input
+                  id="email"
+                  type="email"
+                  required
+                  placeholder="seu@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <label htmlFor="password" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Senha
+              </label>
+              <div className="relative">
+                <Lock className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                <Input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  placeholder="Digite sua senha"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="px-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <CheckboxField
+                id="remember-me"
+                label="Lembrar de mim"
+                checked={rememberMe}
+                onCheckedChange={(checked) => setRememberMe(checked === true)}
+              />
+              <a href="#" className="text-sm font-medium text-violet-600 hover:text-violet-700 dark:text-violet-400">
+                Esqueceu sua senha?
+              </a>
+            </div>
+
+            <Button type="submit" className="w-full">
+              Entrar
+            </Button>
+          </form>
+
+          <div className="my-6 flex items-center gap-3">
+            <div className="h-px flex-1 bg-gray-200 dark:bg-gray-800" />
+            <span className="text-xs text-gray-400">ou</span>
+            <div className="h-px flex-1 bg-gray-200 dark:bg-gray-800" />
+          </div>
+
+          <p className="flex items-start gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-violet-600 dark:text-violet-400" />
+            <span>
+              Ao continuar, você concorda com nossos{' '}
+              <a href="#" className="font-medium text-violet-600 hover:text-violet-700 dark:text-violet-400">
+                Termos de Uso
+              </a>{' '}
+              e{' '}
+              <a href="#" className="font-medium text-violet-600 hover:text-violet-700 dark:text-violet-400">
+                Política de Privacidade
+              </a>
+              .
+            </span>
+          </p>
         </div>
       </div>
     </div>

@@ -60,6 +60,9 @@ npm run preview    # serve o build de produção localmente
 | [`ds-06-sombras.md`](./ds-06-sombras.md) | Página "Sombras" — escala de elevação, mapeamento elevação→componente, sombras coloridas/internas |
 | [`ds-07-bordas.md`](./ds-07-bordas.md) | Página "Bordas" — ⏳ provisória — espessura, estilo, raio e cor de borda por componente |
 | [`ds-08-radios.md`](./ds-08-radios.md) | Página "Radios" — componente `RadioGroup`/`RadioGroup.Field`, tokens e quando usar Radio vs. Select vs. Checkbox |
+| [`ds-09-checkbox.md`](./ds-09-checkbox.md) | Página "Checkbox" — componente `Checkbox`/`CheckboxField`, tokens, padrão "Selecionar tudo" |
+| [`ds-10-layout.md`](./ds-10-layout.md) | Página "Layout" — blocos estruturais (Container/Grid/Stack/Flex/Spacer/Divider/ScrollArea/ResizablePanel/SplitPane) e quando usar cada um |
+| [`ds-22-autenticacao.md`](./ds-22-autenticacao.md) | Rota `/cadastro` — wizard de cadastro Cliente (4 steps)/Empresa (6 steps), `useCadastroWizard`, componentes `Steps`/`OtpInput`/`ImageUpload` |
 
 Os documentos `04`, `05`, `06`, `07` e a série `ds-*` são **estruturais e permanentes** — não pertencem a uma fase específica e devem ser mantidos atualizados conforme o código evolui. Os documentos `00`–`03` (e os que vierem depois, um por módulo) são **registros de fase**: descrevem o que foi decidido e entregue em cada etapa, e não mudam retroativamente.
 
