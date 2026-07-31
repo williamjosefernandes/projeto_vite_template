@@ -38,6 +38,7 @@ const ERROR_MESSAGES: Partial<Record<ErrorCode, string>> = {
   USER_NOT_FOUND_IN_ACCOUNT: 'Usuário não encontrado nesta conta.',
   CANNOT_DELETE_OWNER: 'O proprietário da conta não pode ser removido.',
   CANNOT_BLOCK_OWNER: 'O proprietário da conta não pode ser bloqueado.',
+  RATE_LIMITED: 'Muitas tentativas em pouco tempo. Aguarde um momento e tente novamente.',
 };
 
 /** Extrai uma mensagem amigável de um erro do axios, com fallback para erros inesperados/sem código mapeado. */

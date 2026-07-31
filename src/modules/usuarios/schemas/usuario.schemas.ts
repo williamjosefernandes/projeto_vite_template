@@ -22,9 +22,9 @@ export const editarUsuarioSchema = z.object({
 
 export type EditarUsuarioFormData = z.infer<typeof editarUsuarioSchema>;
 
-/** Valores documentados por `UpdateUserStatusDto` (enum `UserStatus` do Prisma). */
+/** Valores documentados por `UpdateUserStatusDto` (enum `MembershipStatus` do Prisma — status do vínculo, não do usuário). */
 export const alterarStatusSchema = z.object({
-  status: z.enum(['PENDING_EMAIL', 'ACTIVE', 'BLOCKED', 'SUSPENDED']),
+  status: z.enum(['ACTIVE', 'INVITED', 'SUSPENDED', 'REMOVED']),
 });
 
 export type AlterarStatusFormData = z.infer<typeof alterarStatusSchema>;

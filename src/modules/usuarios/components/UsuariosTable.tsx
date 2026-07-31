@@ -2,20 +2,14 @@ import type { ColumnDef, PaginationState } from '@tanstack/react-table';
 import { MoreVertical, Pencil, ShieldEllipsis, Trash2 } from 'lucide-react';
 import { Avatar, Badge, DropdownMenu, PermissionGate, Table } from '../../../components/ui';
 import type { BadgeProps } from '../../../components/ui/Badge';
-import type { AdminUserListItem, MembershipStatus, UserStatus } from '../../../users/types';
+import type { AdminUserListItem, UserStatus } from '../../../users/types';
+import { MEMBERSHIP_STATUS_META } from '../../../users/utils';
 
 const USER_STATUS_BADGE: Record<UserStatus, { label: string; variant: BadgeProps['variant'] }> = {
   PENDING_EMAIL: { label: 'Pendente', variant: 'warning' },
   ACTIVE: { label: 'Ativo', variant: 'success' },
   BLOCKED: { label: 'Bloqueado', variant: 'danger' },
   SUSPENDED: { label: 'Suspenso', variant: 'neutral' },
-};
-
-const MEMBERSHIP_STATUS_BADGE: Record<MembershipStatus, { label: string; variant: BadgeProps['variant'] }> = {
-  ACTIVE: { label: 'Ativo', variant: 'success' },
-  INVITED: { label: 'Convidado', variant: 'info' },
-  SUSPENDED: { label: 'Suspenso', variant: 'warning' },
-  REMOVED: { label: 'Removido', variant: 'neutral' },
 };
 
 interface RowActionsProps {
@@ -126,7 +120,7 @@ export function UsuariosTable({
       id: 'vinculo',
       header: 'Vínculo',
       cell: ({ row }) => {
-        const meta = MEMBERSHIP_STATUS_BADGE[row.original.status];
+        const meta = MEMBERSHIP_STATUS_META[row.original.status];
         return <Badge variant={meta.variant}>{meta.label}</Badge>;
       },
     },

@@ -87,7 +87,11 @@ export interface UpdateUserAdminRequest {
   phone?: string;
 }
 
-/** `UpdateUserStatusDto`. */
+/**
+ * `UpdateUserStatusDto` — status do VÍNCULO com esta conta (`MembershipStatus`),
+ * não o status global do usuário. Ver `AdminUserListItem.status` (mesmo campo,
+ * lado leitura) e `prisma/SEED.md §7.1` no backend para o histórico do bug corrigido.
+ */
 export interface UpdateUserStatusRequest {
-  status: UserStatus;
+  status: MembershipStatus;
 }

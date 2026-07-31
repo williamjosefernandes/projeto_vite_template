@@ -191,7 +191,7 @@ export function UsuariosPage() {
           key={statusItem.userId}
           open
           onOpenChange={(open) => !open && setStatusItem(null)}
-          currentStatus={statusItem.user.status}
+          currentStatus={statusItem.status}
           isSubmitting={updateUserStatus.isPending}
           onSubmit={(data) =>
             updateUserStatus.mutate({ id: statusItem.userId, payload: data }, { onSuccess: () => setStatusItem(null) })
