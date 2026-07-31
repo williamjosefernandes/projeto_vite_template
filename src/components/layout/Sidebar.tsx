@@ -3,7 +3,8 @@ import { ChevronDown, ChevronUp, CircleHelp } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Avatar, Tooltip } from '../ui';
 import { cn } from '../../lib/utils';
-import { useSessionStore } from '../../store/useSessionStore';
+import { useCurrentAccount, useCurrentUser } from '../../auth/hooks';
+import { getUserFullName } from '../../auth/utils';
 import { useSidebarStore } from '../../store/useSidebarStore';
 import { useVisibleMenu } from '../../hooks/useVisibleMenu';
 import { AccountSwitcherMenu } from './AccountSwitcherMenu';
@@ -94,8 +95,11 @@ function ModuleGroup({ group, collapsed }: { group: MenuGroup; collapsed: boolea
 export function Sidebar() {
   const collapsed = useSidebarStore((s) => s.collapsed);
   const menuGroups = useVisibleMenu();
-  const user = useSessionStore((s) => s.user);
+  const user = useCurrentUser();
+  const { currentAccount } = useCurrentAccount();
   const [footerOpen, setFooterOpen] = useState(false);
+
+  if (!user) return null;
 
   const navigationGroup = menuGroups.find((g) => !g.collapsible);
   const moduleGroups = menuGroups.filter((g) => g.collapsible);
@@ -185,13 +189,13 @@ export function Sidebar() {
               )}
             >
               <Avatar>
-                <Avatar.Fallback>{user.name.charAt(0)}</Avatar.Fallback>
+                <Avatar.Fallback>{user.firstName.charAt(0)}</Avatar.Fallback>
               </Avatar>
               {!collapsed && (
                 <>
                   <span className="min-w-0 flex-1 text-left">
-                    <p className="truncate text-sm font-semibold text-gray-900 dark:text-gray-100">{user.name}</p>
-                    <p className="truncate text-xs text-gray-400">{user.role}</p>
+                    <p className="truncate text-sm font-semibold text-gray-900 dark:text-gray-100">{getUserFullName(user)}</p>
+                    <p className="truncate text-xs text-gray-400">{currentAccount?.profile.name}</p>
                   </span>
                   {footerOpen ? (
                     <ChevronUp className="h-4 w-4 shrink-0 text-gray-400" />

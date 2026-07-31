@@ -4,7 +4,9 @@ Documento estrutural e permanente. Substitui a versão provisória anterior — 
 
 ## Rota
 
-`/cadastro` — fora do `AppShell` do portal e da `DesignSystemLayout` da documentação, com casca própria (`AuthLayout`). Ver também `/login` (`modules/auth/LoginPage.tsx`, layout centralizado diferente, não afetado por esta etapa).
+`/cadastro` — fora do `AppShell` do portal e da `DesignSystemLayout` da documentação, com casca própria (`PublicLayout`, em `src/auth/layouts/`). Ver também `/login` (`modules/auth/LoginPage.tsx`).
+
+> **Atualização (`docs/08-autenticacao.md`):** `AuthLayout` foi renomeado e movido para `src/auth/layouts/PublicLayout.tsx` — agora é a casca compartilhada de *todas* as telas públicas (Login, Cadastro, Esqueci senha, Redefinir senha), não só do cadastro. `LoginPage` já usa o mesmo componente (a nota da seção "Nota de arquitetura" abaixo, que descrevia um layout de Login diferente, ficou desatualizada e foi corrigida).
 
 ## Ramificação Cliente vs. Empresa
 
@@ -21,7 +23,6 @@ Os 3 primeiros steps são idênticos (mesmos componentes `StepAcesso`/`StepConfi
 
 ```
 components/
-├── AuthLayout.tsx            # painel esquerdo fixo (gradiente) + estrutura direita
 ├── WizardStepShell.tsx       # stepper + título/subtítulo + conteúdo + rodapé (comum a todos os steps do wizard)
 ├── AccountTypeSelector.tsx   # Step 0
 ├── StepAcesso.tsx            # Step 1
@@ -71,4 +72,4 @@ Adicionados a `docs/05-inventario-componentes.md`. `lib/masks.ts` (novo) central
 
 ## Nota de arquitetura
 
-`AuthLayout` (deste módulo) é distinto do layout de `LoginPage.tsx` (`modules/auth/`) — este último usa um card centralizado (`min-h-screen items-center justify-center`), enquanto o de cadastro é split-screen `h-screen` sem scroll de página. Não foram unificados nesta etapa porque os prints de referência de cada fluxo pedem estruturas visuais diferentes; se uma unificação for desejada no futuro, avaliar com o print de Login como referência antes de decidir qual padrão prevalece.
+`PublicLayout` (`src/auth/layouts/`) é a casca compartilhada de todas as telas deslogadas — split-screen `h-screen` sem scroll de página, painel esquerdo com gradiente + destaques. `LoginPage`, `CadastroPage`, `ForgotPasswordPage` e `ResetPasswordPage` usam o mesmo componente (ver `docs/08-autenticacao.md`).

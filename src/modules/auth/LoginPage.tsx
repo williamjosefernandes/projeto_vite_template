@@ -1,30 +1,37 @@
-import { useState } from 'react';
-import type { FormEvent } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Lock, Mail, ShieldCheck, UserPlus } from 'lucide-react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Controller, useForm } from 'react-hook-form';
+import { Link } from 'react-router-dom';
+import { Loader2, Mail, ShieldCheck, UserPlus } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { CheckboxField } from '../../components/ui/Checkbox';
 import { Typography } from '../../components/ui/Typography';
-import { AuthLayout } from '../cadastro/components/AuthLayout';
+import { PublicLayout } from '../../auth/layouts';
+import { PasswordField } from '../../auth/components';
+import { useLogin } from '../../auth/hooks';
+import { loginSchema, type LoginFormData } from './schemas/login.schema';
 
 const SUPPORT_TEXT =
   'Um sistema completo para construir produtos digitais consistentes, acessíveis e de alta qualidade.';
 
 export function LoginPage() {
-  const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const login = useLogin();
+  const {
+    register,
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: { email: '', password: '', rememberMe: false },
+  });
 
-  const handleLogin = (e: FormEvent) => {
-    e.preventDefault();
-    navigate('/');
+  const onSubmit = (data: LoginFormData) => {
+    login.mutate({ email: data.email, password: data.password, authProvider: 'LOCAL' });
   };
 
   return (
-    <AuthLayout
+    <PublicLayout
       supportText={SUPPORT_TEXT}
       thirdHighlightDescription="Padrões que facilitam a evolução"
       headerLink={
@@ -42,7 +49,7 @@ export function LoginPage() {
         </Typography>
         <Typography className="mt-1">Faça login para acessar sua conta</Typography>
 
-        <form onSubmit={handleLogin} className="mt-8 space-y-5">
+        <form onSubmit={handleSubmit(onSubmit)} noValidate className="mt-8 space-y-5">
           <div className="space-y-1.5">
             <label htmlFor="email" className="text-sm font-medium text-gray-700 dark:text-gray-300">
               E-mail
@@ -52,55 +59,48 @@ export function LoginPage() {
               <Input
                 id="email"
                 type="email"
-                required
+                autoComplete="email"
                 placeholder="seu@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
                 className="pl-10"
+                {...register('email')}
               />
             </div>
+            {errors.email && <p className="text-xs text-red-600 dark:text-red-400">{errors.email.message}</p>}
           </div>
 
-          <div className="space-y-1.5">
-            <label htmlFor="password" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              Senha
-            </label>
-            <div className="relative">
-              <Lock className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
-              <Input
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                required
-                placeholder="Digite sua senha"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="px-10"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword((prev) => !prev)}
-                className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
-              >
-                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </button>
-            </div>
-          </div>
+          <PasswordField
+            id="password"
+            label="Senha"
+            placeholder="Digite sua senha"
+            autoComplete="current-password"
+            error={errors.password?.message}
+            {...register('password')}
+          />
 
           <div className="flex items-center justify-between">
-            <CheckboxField
-              id="remember-me"
-              label="Lembrar de mim"
-              checked={rememberMe}
-              onCheckedChange={(checked) => setRememberMe(checked === true)}
+            <Controller
+              control={control}
+              name="rememberMe"
+              render={({ field }) => (
+                <CheckboxField
+                  id="remember-me"
+                  label="Lembrar de mim"
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              )}
             />
-            <a href="#" className="text-sm font-medium text-violet-600 hover:text-violet-700 dark:text-violet-400">
+            <Link
+              to="/forgot-password"
+              className="text-sm font-medium text-violet-600 hover:text-violet-700 dark:text-violet-400"
+            >
               Esqueceu sua senha?
-            </a>
+            </Link>
           </div>
 
-          <Button type="submit" className="w-full">
-            Entrar
+          <Button type="submit" className="w-full" disabled={login.isPending}>
+            {login.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+            {login.isPending ? 'Entrando…' : 'Entrar'}
           </Button>
         </form>
 
@@ -133,6 +133,6 @@ export function LoginPage() {
           </span>
         </p>
       </div>
-    </AuthLayout>
+    </PublicLayout>
   );
 }

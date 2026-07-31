@@ -42,8 +42,9 @@ A receita original desta etapa foi escrita para **Tailwind CSS v3** (`tailwind.c
 | Pacote | Para que serve |
 |---|---|
 | `react-router-dom` | Roteamento client-side |
-| `zustand` | Estado global leve (stores em `src/store`) |
+| `zustand` | Estado global leve (stores em `src/store` e `src/auth/stores`) |
 | `@tanstack/react-query` | Data fetching, cache e sincronização com o servidor |
+| `axios` | Cliente HTTP — instância única em `src/api/http.ts` (interceptors de Authorization e refresh automático em 401). Adicionado na etapa de autenticação (`docs/08-autenticacao.md`); nenhum outro arquivo deve chamar `axios` diretamente. |
 
 ### Formulários
 | Pacote | Para que serve |

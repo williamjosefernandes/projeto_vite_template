@@ -2,7 +2,8 @@ import { LayoutDashboard } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { EmptyState } from '../../components/ui';
 import { usePermission } from '../../hooks/usePermission';
-import { useSessionStore } from '../../store/useSessionStore';
+import { useCurrentUser, usePermissions } from '../../auth/hooks';
+import { getUserFullName } from '../../auth/utils';
 import { DashboardHeader } from './components/DashboardHeader';
 import { FinancialSummaryCard } from './components/FinancialSummaryCard';
 import { NotificationsCard } from './components/NotificationsCard';
@@ -34,8 +35,8 @@ function CollapsingTwoColRow({ left, right }: { left: ReactNode; right: ReactNod
 }
 
 export function DashboardPage() {
-  const user = useSessionStore((s) => s.user);
-  const permissions = useSessionStore((s) => s.permissions);
+  const user = useCurrentUser();
+  const permissions = usePermissions();
   const data = useDashboardData();
 
   const canSeeStatCards = usePermission(DASHBOARD_PERMISSIONS.statCards);
@@ -57,9 +58,11 @@ export function DashboardPage() {
 
   const hasAnyWidgetVisible = visibleStats.length > 0 || showMainColumn || showSidebarColumn;
 
+  if (!user) return null;
+
   return (
     <div className="flex flex-col gap-6">
-      <DashboardHeader userName={user.name} periodLabel={PERIOD_LABEL} quickActions={data.quickActions} />
+      <DashboardHeader userName={getUserFullName(user)} periodLabel={PERIOD_LABEL} quickActions={data.quickActions} />
 
       {!hasAnyWidgetVisible ? (
         <EmptyState

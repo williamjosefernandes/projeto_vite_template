@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Mail } from 'lucide-react';
+import { Loader2, Mail } from 'lucide-react';
 import { Button, OtpInput } from '../../../components/ui';
 import { WizardStepShell } from './WizardStepShell';
 import type { AccountType } from '../hooks/useCadastroWizard';
@@ -14,6 +14,9 @@ export interface StepConfirmarEmailProps {
   email: string;
   onSubmit: (codigo: string) => void;
   onBack: () => void;
+  onResend: () => void;
+  isVerifying?: boolean;
+  isResending?: boolean;
 }
 
 function formatSeconds(total: number) {
@@ -24,7 +27,17 @@ function formatSeconds(total: number) {
   return `${minutes}:${seconds}`;
 }
 
-export function StepConfirmarEmail({ accountType, stepsConfig, currentStep, email, onSubmit, onBack }: StepConfirmarEmailProps) {
+export function StepConfirmarEmail({
+  accountType,
+  stepsConfig,
+  currentStep,
+  email,
+  onSubmit,
+  onBack,
+  onResend,
+  isVerifying,
+  isResending,
+}: StepConfirmarEmailProps) {
   const [code, setCode] = useState('');
   const [secondsLeft, setSecondsLeft] = useState(RESEND_SECONDS);
 
@@ -35,8 +48,9 @@ export function StepConfirmarEmail({ accountType, stepsConfig, currentStep, emai
   }, [secondsLeft]);
 
   function handleResend() {
-    if (secondsLeft > 0) return;
+    if (secondsLeft > 0 || isResending) return;
     setSecondsLeft(RESEND_SECONDS);
+    onResend();
   }
 
   return (
@@ -49,11 +63,12 @@ export function StepConfirmarEmail({ accountType, stepsConfig, currentStep, emai
       footer={
         <div>
           <div className="flex gap-3">
-            <Button type="button" variant="secondary" onClick={onBack}>
+            <Button type="button" variant="secondary" onClick={onBack} disabled={isVerifying}>
               ← Voltar
             </Button>
-            <Button type="button" disabled={code.length !== 6} onClick={() => onSubmit(code)}>
-              Confirmar código
+            <Button type="button" disabled={code.length !== 6 || isVerifying} onClick={() => onSubmit(code)}>
+              {isVerifying && <Loader2 className="h-4 w-4 animate-spin" />}
+              {isVerifying ? 'Confirmando…' : 'Confirmar código'}
             </Button>
           </div>
           <p className="mt-3 text-sm text-gray-500 dark:text-gray-400">
@@ -61,7 +76,7 @@ export function StepConfirmarEmail({ accountType, stepsConfig, currentStep, emai
             <button
               type="button"
               onClick={handleResend}
-              disabled={secondsLeft > 0}
+              disabled={secondsLeft > 0 || isResending}
               className="font-medium text-violet-600 hover:underline disabled:cursor-not-allowed disabled:text-gray-400 disabled:no-underline dark:text-violet-400 dark:disabled:text-gray-600"
             >
               Reenviar código {secondsLeft > 0 && `(${formatSeconds(secondsLeft)})`}
@@ -71,7 +86,7 @@ export function StepConfirmarEmail({ accountType, stepsConfig, currentStep, emai
       }
     >
       <div className="space-y-4">
-        <OtpInput value={code} onChange={setCode} onComplete={onSubmit} />
+        <OtpInput value={code} onChange={setCode} onComplete={onSubmit} disabled={isVerifying} />
         <p className="text-sm text-gray-500 dark:text-gray-400">
           Não recebeu o código? Verifique sua caixa de spam ou lixo eletrônico.
         </p>

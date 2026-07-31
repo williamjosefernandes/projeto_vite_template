@@ -11,7 +11,8 @@ import {
   User,
 } from 'lucide-react';
 import { DropdownMenu } from '../ui';
-import { useSessionStore } from '../../store/useSessionStore';
+import { useCurrentAccount, useLogout } from '../../auth/hooks';
+import { getAccountAvatarColorClass } from '../../lib/account-avatar';
 
 const VISIBLE_ACCOUNTS_LIMIT = 5;
 
@@ -39,9 +40,8 @@ interface AccountSwitcherMenuProps {
  * card de usuário no rodapé da sidebar (ver `side`/`align` por trigger).
  */
 export function AccountSwitcherMenu({ trigger, align = 'end', side = 'bottom' }: AccountSwitcherMenuProps) {
-  const accounts = useSessionStore((s) => s.accounts);
-  const activeAccountId = useSessionStore((s) => s.activeAccountId);
-  const switchAccount = useSessionStore((s) => s.switchAccount);
+  const { accounts, currentAccount, switchAccount } = useCurrentAccount();
+  const logout = useLogout();
 
   const visibleAccounts = accounts.slice(0, VISIBLE_ACCOUNTS_LIMIT);
 
@@ -62,14 +62,16 @@ export function AccountSwitcherMenu({ trigger, align = 'end', side = 'bottom' }:
               onSelect={() => switchAccount(account.id)}
               className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-800"
             >
-              <span className={`flex h-9 w-9 items-center justify-center rounded-lg ${account.colorClass}`}>
-                <account.icon className="h-5 w-5" strokeWidth={1.5} />
+              <span
+                className={`flex h-9 w-9 items-center justify-center rounded-lg text-sm font-semibold ${getAccountAvatarColorClass(account.id)}`}
+              >
+                {account.name.charAt(0).toUpperCase()}
               </span>
               <span className="min-w-0 flex-1">
                 <p className="truncate text-sm font-semibold text-gray-900 dark:text-gray-100">{account.name}</p>
-                <p className="truncate text-xs text-gray-400">{account.description}</p>
+                <p className="truncate text-xs text-gray-400">{account.profile}</p>
               </span>
-              {account.id === activeAccountId && (
+              {account.id === currentAccount?.id && (
                 <span className="flex h-5 w-5 items-center justify-center rounded-full bg-violet-600 text-white">
                   <Check className="h-3 w-3" />
                 </span>
@@ -104,7 +106,11 @@ export function AccountSwitcherMenu({ trigger, align = 'end', side = 'bottom' }:
           </DropdownMenu.Item>
         ))}
         <DropdownMenu.Separator />
-        <DropdownMenu.Item className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20">
+        <DropdownMenu.Item
+          onSelect={() => logout.mutate()}
+          disabled={logout.isPending}
+          className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
+        >
           <LogOut className="h-4 w-4" /> Sair
         </DropdownMenu.Item>
       </DropdownMenu.Content>

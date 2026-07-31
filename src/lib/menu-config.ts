@@ -17,11 +17,12 @@ import type { MenuGroup } from '../types/rbac';
 /**
  * Configuração estática do menu — grupos e itens, cada um com a permissão
  * necessária para ser exibido. `useVisibleMenu` filtra isto contra as
- * permissões da conta ativa (ver `useSessionStore`).
+ * permissões da conta ativa (ver `useAuthStore`, em `src/auth/stores`).
  *
  * Para adicionar um item novo: acrescente-o ao grupo correspondente aqui
- * e inclua a `requiredPermission` nas contas que devem enxergá-lo em
- * `src/lib/mock-accounts.ts` (`mockMemberships`).
+ * e garanta que o backend inclua a `requiredPermission` correspondente na
+ * lista `permissions[]` devolvida pelo login para as contas que devem
+ * enxergá-lo.
  */
 export const menuConfig: MenuGroup[] = [
   {

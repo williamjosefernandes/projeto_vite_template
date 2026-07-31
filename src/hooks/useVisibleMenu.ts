@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { menuConfig } from '../lib/menu-config';
-import { useSessionStore } from '../store/useSessionStore';
+import { useAuthStore } from '../auth/stores';
 import type { MenuGroup } from '../types/rbac';
 
 /**
@@ -9,7 +9,7 @@ import type { MenuGroup } from '../types/rbac';
  * Financeiro não mostra o grupo "Financeiro" na sidebar).
  */
 export function useVisibleMenu(): MenuGroup[] {
-  const permissions = useSessionStore((s) => s.permissions);
+  const permissions = useAuthStore((s) => s.permissions);
 
   return useMemo(
     () =>

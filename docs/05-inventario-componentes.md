@@ -65,8 +65,8 @@ Ver `docs/02-appshell-navegacao.md` para o funcionamento completo (RBAC do menu,
 | Componente | Caminho | Variantes | Props principais | Exemplo de uso |
 |---|---|---|---|---|
 | **AppShell** | `components/layout/AppShell.tsx` | Nenhuma | Sem props — lê `useSidebarStore`, `useVisibleMenu` diretamente; renderiza `<Outlet />` | Elemento pai de todas as rotas do portal em `src/routes/router.tsx` |
-| **Sidebar** | `components/layout/Sidebar.tsx` | Expandida (280px) / recolhida (80px, só ícones + Tooltip) | Sem props — lê `useSidebarStore`, `useVisibleMenu`, `useSessionStore` | Renderizado uma vez dentro de `AppShell` |
-| **Topbar** | `components/layout/Topbar.tsx` | Nenhuma | Sem props — lê `useTheme`, `useSessionStore`, `useSidebarStore` | Renderizado uma vez dentro de `AppShell` |
+| **Sidebar** | `components/layout/Sidebar.tsx` | Expandida (280px) / recolhida (80px, só ícones + Tooltip) | Sem props — lê `useSidebarStore`, `useVisibleMenu`, `useCurrentUser`/`useCurrentAccount` (`src/auth/hooks`) | Renderizado uma vez dentro de `AppShell` |
+| **Topbar** | `components/layout/Topbar.tsx` | Nenhuma | Sem props — lê `useTheme`, `useCurrentUser`/`useCurrentAccount`, `useSidebarStore` | Renderizado uma vez dentro de `AppShell` |
 | **AccountSwitcherMenu** | `components/layout/AccountSwitcherMenu.tsx` | Ancorado para baixo (topbar) ou para cima (rodapé da sidebar) | `trigger: ReactNode`, `align?: 'start'\|'end'\|'center'` (padrão `end`), `side?: 'top'\|'bottom'` (padrão `bottom`) | `<AccountSwitcherMenu trigger={<button>...</button>} side="top" align="start" />` |
 | **NotificationsPopover** | `components/layout/NotificationsPopover.tsx` | Nenhuma | Sem props — lista mockada interna | Usado dentro de `Topbar` |
 | **DesignSystemSidebar** | `components/layout/DesignSystemSidebar.tsx` | Nenhuma | Sem props — lê `dsMenuGroups` (`lib/ds-menu-config.ts`) e `useTheme` | Sidebar própria da documentação viva do Design System (`/design-system`), independente da `Sidebar` do portal — ver `docs/ds-00-estrutura-e-visao-geral.md` |
@@ -79,7 +79,7 @@ Peças que não são "visuais" no mesmo sentido de `components/ui` — são util
 
 - **Caminho:** `src/hooks/usePermission.ts`
 - **Assinatura:** `usePermission(required: string | string[]): boolean`
-- **O que faz:** lê `useSessionStore.permissions` (permissões já resolvidas para a conta ativa, ver `docs/02-appshell-navegacao.md`) e retorna `true` só se **todas** as permissões informadas estiverem presentes. Reativo — reavalia sozinho quando a conta ativa muda (`switchAccount`), sem precisar de reload.
+- **O que faz:** lê `useAuthStore.permissions` (`src/auth/stores`, permissões já resolvidas para a conta ativa — ver `docs/08-autenticacao.md`) e retorna `true` só se **todas** as permissões informadas estiverem presentes. Reativo — reavalia sozinho quando a conta ativa muda (`switchAccount`) ou o usuário faz login, sem precisar de reload.
 ```tsx
 import { usePermission } from '@/hooks/usePermission';
 
@@ -112,7 +112,7 @@ import { PermissionGate } from '@/components/ui';
 Qualquer módulo novo que precise condicionar UI por permissão segue o mesmo padrão usado no Dashboard (`src/modules/dashboard/dashboard.permissions.ts`):
 
 1. Declare um objeto `const` de permissões do módulo (`as const`), com uma chave por widget/ação — não strings soltas espalhadas pelo código.
-2. Inclua essas permissões nos mocks de conta relevantes (`src/lib/mock-accounts.ts`, `mockMemberships`) para que o comportamento seja demonstrável trocando de conta.
+2. Garanta que o backend inclua essas permissões na lista `permissions[]` devolvida por `POST /api/v1/auth/login` (ver `docs/08-autenticacao.md`) para as contas que devem ter acesso ao módulo.
 3. Use `PermissionGate` para condicionar blocos isolados; use `usePermission` diretamente só quando o booleano também precisar decidir layout (grid dinâmico, `col-span`, etc.).
 4. Se ocultar itens puder deixar buracos num grid multi-coluna, resolva com um componente auxiliar que colapsa o `col-span` dos itens restantes — não com CSS estático por posição (ver `CollapsingTwoColRow` em `DashboardPage.tsx` como referência).
 5. Trate o caso de "zero itens visíveis" com `EmptyState` (`components/ui/EmptyState`) em vez de deixar a tela em branco sem explicação.

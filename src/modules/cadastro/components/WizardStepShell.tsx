@@ -15,7 +15,7 @@ export interface WizardStepShellProps {
   securityNote?: ReactNode;
 }
 
-/** Estrutura comum de um step do wizard: stepper + título/subtítulo + conteúdo + rodapé. Badge de tipo de conta fica no `AuthLayout`. */
+/** Estrutura comum de um step do wizard: stepper + título/subtítulo + conteúdo + rodapé. Badge de tipo de conta fica no `PublicLayout`. */
 export function WizardStepShell({
   accountType: _accountType,
   stepsConfig,

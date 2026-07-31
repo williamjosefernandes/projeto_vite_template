@@ -7,7 +7,7 @@ const highlights = [
   { icon: Zap, title: 'Rápido e simples', description: 'Cadastro fácil e em poucos passos' },
 ];
 
-export interface AuthLayoutProps {
+export interface PublicLayoutProps {
   /** Texto de apoio abaixo do logo — muda conforme a etapa (seleção vs. wizard). */
   supportText: string;
   /** Terceiro item de destaque — descrição muda entre a tela de seleção e o wizard. */
@@ -29,18 +29,19 @@ const defaultHeaderLink = (
 );
 
 /**
- * Casca das telas de cadastro/autenticação: painel esquerdo fixo (~38-40%,
- * gradiente + destaques) e painel direito com o conteúdo do step atual.
- * `h-screen`, sem scroll na página — cada step controla seu próprio
- * scroll interno se o conteúdo for maior que a viewport.
+ * Casca de todas as telas públicas (usuário deslogado): Login, Cadastro,
+ * Esqueci senha, Redefinir senha, Verificar e-mail, Convites. Painel
+ * esquerdo fixo (~38-40%, gradiente + destaques) e painel direito com o
+ * conteúdo da página atual. `h-screen`, sem scroll na página — cada tela
+ * controla seu próprio scroll interno se o conteúdo for maior que a viewport.
  */
-export function AuthLayout({
+export function PublicLayout({
   supportText,
   thirdHighlightDescription,
   accountTypeBadge,
   headerLink = defaultHeaderLink,
   children,
-}: AuthLayoutProps) {
+}: PublicLayoutProps) {
   return (
     <div className="flex h-screen overflow-hidden bg-white dark:bg-gray-950">
       <div className="relative hidden w-[38%] shrink-0 flex-col justify-between overflow-hidden bg-gradient-to-br from-indigo-950 via-indigo-800 to-violet-700 p-10 text-white lg:flex">

@@ -1,7 +1,12 @@
+import { useMutation } from '@tanstack/react-query';
 import { Building2, User } from 'lucide-react';
+import { toast } from 'sonner';
 import { Badge } from '../../components/ui';
+import { PublicLayout } from '../../auth/layouts';
+import { authApi } from '../../auth/api';
+import { applyLoginResponse } from '../../auth/services';
+import { getApiErrorMessage } from '../../auth/utils';
 import { AccountTypeSelector } from './components/AccountTypeSelector';
-import { AuthLayout } from './components/AuthLayout';
 import { StepAcesso } from './components/StepAcesso';
 import { StepConfirmarEmail } from './components/StepConfirmarEmail';
 import { StepConta } from './components/StepConta';
@@ -10,6 +15,7 @@ import { StepEmpresaEndereco } from './components/StepEmpresaEndereco';
 import { StepSucessoCliente } from './components/StepSucessoCliente';
 import { StepSucessoEmpresa } from './components/StepSucessoEmpresa';
 import { useCadastroWizard } from './hooks/useCadastroWizard';
+import type { AcessoData } from './schemas/cadastro.schemas';
 
 const SELECTION_SUPPORT_TEXT =
   'Comece criando sua conta e tenha acesso a todos os recursos da plataforma. Escolha o tipo de conta que melhor atende às suas necessidades.';
@@ -21,11 +27,46 @@ export function CadastroPage() {
   const wizard = useCadastroWizard();
   const { accountType, currentStep, currentStepId, stepsConfig, data, goToNextStep, goToPreviousStep, saveStepData } = wizard;
 
+  const registerMutation = useMutation({
+    mutationFn: (values: AcessoData) =>
+      authApi.register({
+        firstName: values.nome,
+        lastName: values.sobrenome,
+        email: values.email,
+        password: values.senha,
+      }),
+    onSuccess: (_response, values) => {
+      saveStepData('acesso', values);
+      goToNextStep();
+    },
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Não foi possível criar sua conta.')),
+  });
+
+  /** Confirma o código e, em seguida, loga automaticamente — `verify-email` não emite sessão sozinho. */
+  const confirmEmailMutation = useMutation({
+    mutationFn: async (codigo: string) => {
+      await authApi.verifyEmail({ email: data.acesso!.email, code: codigo });
+      return authApi.login({ email: data.acesso!.email, password: data.acesso!.senha, authProvider: 'LOCAL' });
+    },
+    onSuccess: (loginResponse, codigo) => {
+      applyLoginResponse(loginResponse);
+      saveStepData('confirmarEmail', { codigo });
+      goToNextStep();
+    },
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Não foi possível confirmar seu e-mail.')),
+  });
+
+  const resendMutation = useMutation({
+    mutationFn: () => authApi.resendVerification({ email: data.acesso!.email }),
+    onSuccess: () => toast.success('Um novo código foi enviado para o seu e-mail.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Não foi possível reenviar o código.')),
+  });
+
   if (!accountType || currentStep < 0) {
     return (
-      <AuthLayout supportText={SELECTION_SUPPORT_TEXT} thirdHighlightDescription="Recursos pensados para o seu sucesso">
+      <PublicLayout supportText={SELECTION_SUPPORT_TEXT} thirdHighlightDescription="Recursos pensados para o seu sucesso">
         <AccountTypeSelector onSelect={wizard.selectAccountType} />
-      </AuthLayout>
+      </PublicLayout>
     );
   }
 
@@ -36,7 +77,7 @@ export function CadastroPage() {
   };
 
   return (
-    <AuthLayout
+    <PublicLayout
       supportText={WIZARD_SUPPORT_TEXT}
       thirdHighlightDescription="Uma experiência personalizada"
       accountTypeBadge={
@@ -51,10 +92,8 @@ export function CadastroPage() {
           {...commonProps}
           defaultValues={data.acesso}
           onCancel={goToPreviousStep}
-          onSubmit={(values) => {
-            saveStepData('acesso', values);
-            goToNextStep();
-          }}
+          onSubmit={(values) => registerMutation.mutate(values)}
+          isSubmitting={registerMutation.isPending}
         />
       )}
 
@@ -63,10 +102,10 @@ export function CadastroPage() {
           {...commonProps}
           email={data.acesso?.email ?? ''}
           onBack={goToPreviousStep}
-          onSubmit={(codigo) => {
-            saveStepData('confirmarEmail', { codigo });
-            goToNextStep();
-          }}
+          onSubmit={(codigo) => confirmEmailMutation.mutate(codigo)}
+          onResend={() => resendMutation.mutate()}
+          isVerifying={confirmEmailMutation.isPending}
+          isResending={resendMutation.isPending}
         />
       )}
 
@@ -108,6 +147,6 @@ export function CadastroPage() {
 
       {currentStepId === 'sucesso' && accountType === 'cliente' && <StepSucessoCliente {...commonProps} />}
       {currentStepId === 'sucesso' && accountType === 'empresa' && <StepSucessoEmpresa {...commonProps} />}
-    </AuthLayout>
+    </PublicLayout>
   );
 }

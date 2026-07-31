@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import {
   type ColumnDef,
+  type PaginationState,
   type SortingState,
+  type Updater,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
@@ -13,6 +15,7 @@ import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight, Search } fr
 import { cn } from '../../../lib/utils';
 import { Button } from '../Button';
 import { EmptyState } from '../EmptyState';
+import { Pagination } from '../Pagination';
 
 export interface TableProps<TData> {
   columns: ColumnDef<TData, any>[];
@@ -23,11 +26,32 @@ export interface TableProps<TData> {
   emptyTitle?: string;
   emptyDescription?: string;
   className?: string;
+  /**
+   * Modo servidor: `data` já é só a página atual (vinda da API) — desliga
+   * paginação/sorting locais (não faz sentido ordenar/paginar de novo em cima
+   * de um recorte que o servidor já paginou). Requer `pageCount` e o par
+   * `pagination`/`onPaginationChange` controlado por quem chama.
+   */
+  manualPagination?: boolean;
+  /** Total de páginas devolvido pela API (`PageMetaDto.totalPages`). Obrigatório quando `manualPagination`. */
+  pageCount?: number;
+  /** Estado de paginação controlado (0-based) — só usado em modo servidor. */
+  pagination?: PaginationState;
+  onPaginationChange?: (pagination: PaginationState) => void;
+  /**
+   * Filtro controlado por quem chama (ex.: dispara busca via API). Quando
+   * fornecido junto com `onGlobalFilterChange`, substitui o filtro local —
+   * `data` já deve chegar filtrada pelo backend.
+   */
+  globalFilter?: string;
+  onGlobalFilterChange?: (value: string) => void;
 }
 
 /**
- * Tabela de dados com sorting/filtragem/paginação via `@tanstack/react-table`.
- * O componente é apenas visual: quem chama fornece `columns` e `data`.
+ * Tabela de dados via `@tanstack/react-table`. Por padrão, sorting/filtragem/
+ * paginação são locais (client-side) — passe `manualPagination`/
+ * `onGlobalFilterChange` para operar em modo servidor (ver `UsuariosTable`,
+ * em `src/modules/usuarios`, para um exemplo).
  */
 export function Table<TData>({
   columns,
@@ -37,21 +61,48 @@ export function Table<TData>({
   emptyTitle = 'Nenhum registro encontrado',
   emptyDescription,
   className,
+  manualPagination = false,
+  pageCount,
+  pagination: controlledPagination,
+  onPaginationChange,
+  globalFilter: controlledGlobalFilter,
+  onGlobalFilterChange,
 }: TableProps<TData>) {
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [globalFilter, setGlobalFilter] = useState('');
+  const [internalGlobalFilter, setInternalGlobalFilter] = useState('');
+  const [internalPagination, setInternalPagination] = useState<PaginationState>({ pageIndex: 0, pageSize });
+
+  const isFilterControlled = onGlobalFilterChange !== undefined;
+  const globalFilter = isFilterControlled ? (controlledGlobalFilter ?? '') : internalGlobalFilter;
+  const pagination = manualPagination ? (controlledPagination ?? internalPagination) : internalPagination;
+
+  function handleGlobalFilterChange(updater: Updater<string>) {
+    const next = typeof updater === 'function' ? updater(globalFilter) : updater;
+    if (isFilterControlled) onGlobalFilterChange!(next);
+    else setInternalGlobalFilter(next);
+  }
+
+  function handlePaginationChange(updater: Updater<PaginationState>) {
+    const next = typeof updater === 'function' ? updater(pagination) : updater;
+    if (manualPagination && onPaginationChange) onPaginationChange(next);
+    else setInternalPagination(next);
+  }
 
   const table = useReactTable({
     data,
     columns,
-    state: { sorting, globalFilter },
+    state: { sorting: manualPagination ? [] : sorting, globalFilter, pagination },
     onSortingChange: setSorting,
-    onGlobalFilterChange: setGlobalFilter,
+    onGlobalFilterChange: handleGlobalFilterChange,
+    onPaginationChange: handlePaginationChange,
     getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    initialState: { pagination: { pageSize } },
+    getSortedRowModel: manualPagination ? undefined : getSortedRowModel(),
+    getFilteredRowModel: isFilterControlled ? undefined : getFilteredRowModel(),
+    getPaginationRowModel: manualPagination ? undefined : getPaginationRowModel(),
+    manualPagination,
+    manualFiltering: isFilterControlled,
+    enableSorting: !manualPagination,
+    pageCount: manualPagination ? (pageCount ?? -1) : undefined,
   });
 
   const rows = table.getRowModel().rows;
@@ -63,7 +114,7 @@ export function Table<TData>({
           <Search className="h-4 w-4 shrink-0 text-gray-400" />
           <input
             value={globalFilter}
-            onChange={(event) => setGlobalFilter(event.target.value)}
+            onChange={(event) => handleGlobalFilterChange(event.target.value)}
             placeholder={filterPlaceholder}
             className="w-full bg-transparent text-sm text-gray-700 outline-none placeholder:text-gray-400 dark:text-gray-200"
           />
@@ -132,7 +183,20 @@ export function Table<TData>({
         </table>
       </div>
 
-      {rows.length > 0 && (
+      {rows.length > 0 && manualPagination && (
+        <div className="mt-3 flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
+          <span>
+            Página {pagination.pageIndex + 1} de {pageCount ?? 1}
+          </span>
+          <Pagination
+            currentPage={pagination.pageIndex + 1}
+            totalPages={pageCount ?? 1}
+            onPageChange={(page) => handlePaginationChange({ ...pagination, pageIndex: page - 1 })}
+          />
+        </div>
+      )}
+
+      {rows.length > 0 && !manualPagination && (
         <div className="mt-3 flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
           <span>
             Página {table.getState().pagination.pageIndex + 1} de {table.getPageCount() || 1}

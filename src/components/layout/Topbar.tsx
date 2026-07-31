@@ -1,7 +1,8 @@
 import { CircleHelp, Moon, PanelLeft, Search, Sun } from 'lucide-react';
 import { Avatar } from '../ui';
 import { useTheme } from '../../hooks/useTheme';
-import { useSessionStore } from '../../store/useSessionStore';
+import { useCurrentAccount, useCurrentUser } from '../../auth/hooks';
+import { getUserFullName } from '../../auth/utils';
 import { useSidebarStore } from '../../store/useSidebarStore';
 import { AccountSwitcherMenu } from './AccountSwitcherMenu';
 import { NotificationsPopover } from './NotificationsPopover';
@@ -9,7 +10,10 @@ import { NotificationsPopover } from './NotificationsPopover';
 export function Topbar() {
   const toggleCollapsed = useSidebarStore((s) => s.toggleCollapsed);
   const { theme, toggleTheme } = useTheme();
-  const user = useSessionStore((s) => s.user);
+  const user = useCurrentUser();
+  const { currentAccount } = useCurrentAccount();
+
+  if (!user) return null;
 
   return (
     <header className="col-start-2 flex h-16 items-center gap-4 border-b border-gray-200 bg-white px-4 dark:border-gray-800 dark:bg-gray-900">
@@ -61,11 +65,11 @@ export function Topbar() {
           trigger={
             <button type="button" className="flex items-center gap-2 rounded-full py-1 pl-2 pr-1 hover:bg-gray-100 dark:hover:bg-gray-800">
               <span className="hidden text-right sm:block">
-                <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{user.name}</p>
-                <p className="text-xs text-gray-400">{user.role}</p>
+                <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{getUserFullName(user)}</p>
+                <p className="text-xs text-gray-400">{currentAccount?.profile.name}</p>
               </span>
               <Avatar>
-                <Avatar.Fallback>{user.name.charAt(0)}</Avatar.Fallback>
+                <Avatar.Fallback>{user.firstName.charAt(0)}</Avatar.Fallback>
               </Avatar>
             </button>
           }

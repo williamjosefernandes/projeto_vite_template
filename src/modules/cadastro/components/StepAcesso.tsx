@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { Eye, EyeOff, Lock, Mail, User } from 'lucide-react';
+import { Eye, EyeOff, Loader2, Lock, Mail, User } from 'lucide-react';
 import { Button, Input } from '../../../components/ui';
 import { WizardStepShell } from './WizardStepShell';
 import { acessoSchema, type AcessoData } from '../schemas/cadastro.schemas';
@@ -15,9 +15,18 @@ export interface StepAcessoProps {
   defaultValues?: Partial<AcessoData>;
   onSubmit: (data: AcessoData) => void;
   onCancel: () => void;
+  isSubmitting?: boolean;
 }
 
-export function StepAcesso({ accountType, stepsConfig, currentStep, defaultValues, onSubmit, onCancel }: StepAcessoProps) {
+export function StepAcesso({
+  accountType,
+  stepsConfig,
+  currentStep,
+  defaultValues,
+  onSubmit,
+  onCancel,
+  isSubmitting,
+}: StepAcessoProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const {
@@ -48,11 +57,12 @@ export function StepAcesso({ accountType, stepsConfig, currentStep, defaultValue
       }
       footer={
         <div className="flex gap-3">
-          <Button type="button" variant="secondary" onClick={onCancel}>
+          <Button type="button" variant="secondary" onClick={onCancel} disabled={isSubmitting}>
             Cancelar
           </Button>
-          <Button type="submit" form="step-acesso-form">
-            Continuar →
+          <Button type="submit" form="step-acesso-form" disabled={isSubmitting}>
+            {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
+            {isSubmitting ? 'Criando conta…' : 'Continuar →'}
           </Button>
         </div>
       }
