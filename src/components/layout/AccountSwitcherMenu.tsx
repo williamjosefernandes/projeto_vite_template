@@ -56,28 +56,40 @@ export function AccountSwitcherMenu({ trigger, align = 'end', side = 'bottom' }:
       >
         <p className="px-3 pt-2 pb-1 text-xs font-medium uppercase tracking-wide text-gray-400">Minhas contas</p>
         <div className="space-y-0.5">
-          {visibleAccounts.map((account) => (
-            <DropdownMenu.Item
-              key={account.id}
-              onSelect={() => switchAccount(account.id)}
-              className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-800"
-            >
-              <span
-                className={`flex h-9 w-9 items-center justify-center rounded-lg text-sm font-semibold ${getAccountAvatarColorClass(account.id)}`}
+          {visibleAccounts.map((account) => {
+            // `account.id` é o id do Membership (mesmo valor esperado por `switchAccount`) —
+            // por isso compara contra `currentAccount.membership.id`, não contra `currentAccount.id`
+            // (que é o id da Account, um UUID diferente).
+            const isCurrent = account.id === currentAccount?.membership.id;
+            return (
+              <DropdownMenu.Item
+                key={account.id}
+                onSelect={() => switchAccount(account.id)}
+                aria-current={isCurrent}
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 ${
+                  isCurrent ? 'bg-violet-50 dark:bg-violet-900/20' : ''
+                }`}
               >
-                {account.name.charAt(0).toUpperCase()}
-              </span>
-              <span className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold text-gray-900 dark:text-gray-100">{account.name}</p>
-                <p className="truncate text-xs text-gray-400">{account.profile}</p>
-              </span>
-              {account.id === currentAccount?.id && (
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-violet-600 text-white">
-                  <Check className="h-3 w-3" />
+                <span
+                  className={`flex h-9 w-9 items-center justify-center rounded-lg text-sm font-semibold ${getAccountAvatarColorClass(account.id)}`}
+                >
+                  {account.name.charAt(0).toUpperCase()}
                 </span>
-              )}
-            </DropdownMenu.Item>
-          ))}
+                <span className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold text-gray-900 dark:text-gray-100">{account.name}</p>
+                  <p className="truncate text-xs text-gray-400">
+                    {account.profile}
+                    {isCurrent && ' · Conta atual'}
+                  </p>
+                </span>
+                {isCurrent && (
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-violet-600 text-white">
+                    <Check className="h-3 w-3" />
+                  </span>
+                )}
+              </DropdownMenu.Item>
+            );
+          })}
         </div>
         {accounts.length > visibleAccounts.length && (
           <button
