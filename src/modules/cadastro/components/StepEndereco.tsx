@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
-import { Building2, FileText, Hash, MapPin } from 'lucide-react';
+import { Building2, FileText, Flag, Hash, Loader2, MapPin } from 'lucide-react';
 import { Button, Input, Select } from '../../../components/ui';
 import { WizardStepShell } from './WizardStepShell';
-import { empresaEnderecoSchema, type EmpresaEnderecoData } from '../schemas/cadastro.schemas';
+import { enderecoSchema, type EnderecoData } from '../schemas/cadastro.schemas';
 import { maskCep } from '../../../lib/masks';
+import { useCountries } from '../../../onboarding';
 import type { AccountType } from '../hooks/useCadastroWizard';
 import type { StepItem } from '../../../components/ui/Steps';
 
@@ -14,17 +15,20 @@ const ESTADOS_BR = [
   'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO',
 ];
 
-export interface StepEmpresaEnderecoProps {
+export interface StepEnderecoProps {
   accountType: AccountType;
   stepsConfig: StepItem[];
   currentStep: number;
-  defaultValues?: Partial<EmpresaEnderecoData>;
-  onSubmit: (data: EmpresaEnderecoData) => void;
+  defaultValues?: Partial<EnderecoData>;
+  onSubmit: (data: EnderecoData) => void;
   onBack: () => void;
+  isSubmitting?: boolean;
 }
 
-export function StepEmpresaEndereco({ accountType, stepsConfig, currentStep, defaultValues, onSubmit, onBack }: StepEmpresaEnderecoProps) {
+/** `PATCH /v1/onboarding/draft/address` — Step "Endereço", compartilhado entre os fluxos Customer e Company. */
+export function StepEndereco({ accountType, stepsConfig, currentStep, defaultValues, onSubmit, onBack, isSubmitting }: StepEnderecoProps) {
   const [isSearchingCep, setIsSearchingCep] = useState(false);
+  const countriesQuery = useCountries();
   const {
     register,
     handleSubmit,
@@ -32,9 +36,17 @@ export function StepEmpresaEndereco({ accountType, stepsConfig, currentStep, def
     setValue,
     watch,
     formState: { errors },
-  } = useForm<EmpresaEnderecoData>({ resolver: zodResolver(empresaEnderecoSchema), defaultValues });
+  } = useForm<EnderecoData>({ resolver: zodResolver(enderecoSchema), defaultValues });
 
   const cep = watch('cep');
+  const paisId = watch('paisId');
+
+  // Pré-seleciona Brasil assim que a lista de países carregar, se o step ainda não tem um país escolhido.
+  useEffect(() => {
+    if (paisId || !countriesQuery.data) return;
+    const brasil = countriesQuery.data.find((c) => c.code === 'BR');
+    if (brasil) setValue('paisId', brasil.id);
+  }, [countriesQuery.data, paisId, setValue]);
 
   async function handleBuscarCep() {
     const digits = (cep ?? '').replace(/\D/g, '');
@@ -61,21 +73,22 @@ export function StepEmpresaEndereco({ accountType, stepsConfig, currentStep, def
       accountType={accountType}
       stepsConfig={stepsConfig}
       currentStep={currentStep}
-      title="Endereço da empresa"
-      subtitle="Informe o endereço da sua empresa."
+      title="Endereço"
+      subtitle="Informe o endereço vinculado à sua conta."
       securityNote="Suas informações estão seguras e protegidas."
       footer={
         <div className="flex gap-3">
-          <Button type="button" variant="secondary" onClick={onBack}>
+          <Button type="button" variant="secondary" onClick={onBack} disabled={isSubmitting}>
             ← Voltar
           </Button>
-          <Button type="submit" form="step-empresa-endereco-form">
-            Continuar →
+          <Button type="submit" form="step-endereco-form" disabled={isSubmitting}>
+            {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
+            {isSubmitting ? 'Salvando…' : 'Continuar →'}
           </Button>
         </div>
       }
     >
-      <form id="step-empresa-endereco-form" onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <form id="step-endereco-form" onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
           <label className="text-sm font-medium text-gray-700 dark:text-gray-300">CEP</label>
           <div className="flex gap-2">
@@ -96,6 +109,30 @@ export function StepEmpresaEndereco({ accountType, stepsConfig, currentStep, def
         </div>
 
         <div className="space-y-1.5">
+          <label className="text-sm font-medium text-gray-700 dark:text-gray-300">País</label>
+          <Controller
+            control={control}
+            name="paisId"
+            render={({ field }) => (
+              <Select value={field.value} onValueChange={field.onChange}>
+                <Select.Trigger className="relative pl-9">
+                  <Flag className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                  <Select.Value placeholder="Selecione o país" />
+                </Select.Trigger>
+                <Select.Content>
+                  {(countriesQuery.data ?? []).map((country) => (
+                    <Select.Item key={country.id} value={country.id}>
+                      {country.name}
+                    </Select.Item>
+                  ))}
+                </Select.Content>
+              </Select>
+            )}
+          />
+          {errors.paisId && <p className="text-xs text-red-600 dark:text-red-400">{errors.paisId.message}</p>}
+        </div>
+
+        <div className="space-y-1.5 sm:col-span-2">
           <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Logradouro</label>
           <div className="relative">
             <Building2 className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />

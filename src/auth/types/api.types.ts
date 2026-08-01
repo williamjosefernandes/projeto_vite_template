@@ -38,7 +38,9 @@ export type ErrorCode =
   | 'VERIFICATION_CODE_EXPIRED'
   | 'INVALID_RESET_TOKEN'
   | 'RESET_TOKEN_EXPIRED'
-  | 'FAQ_NOT_FOUND';
+  | 'FAQ_NOT_FOUND'
+  | 'DOCUMENT_ALREADY_IN_USE'
+  | 'PHONE_ALREADY_IN_USE';
 
 export interface ApiError {
   code: ErrorCode;

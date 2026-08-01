@@ -9,10 +9,16 @@ export interface StepSucessoClienteProps {
   accountType: AccountType;
   stepsConfig: StepItem[];
   currentStep: number;
+  onAccessPortal: () => void;
 }
 
-export function StepSucessoCliente({ accountType, stepsConfig, currentStep }: StepSucessoClienteProps) {
+export function StepSucessoCliente({ accountType, stepsConfig, currentStep, onAccessPortal }: StepSucessoClienteProps) {
   const navigate = useNavigate();
+
+  const handleAccessPortal = () => {
+    onAccessPortal();
+    navigate('/');
+  };
 
   return (
     <WizardStepShell
@@ -22,7 +28,7 @@ export function StepSucessoCliente({ accountType, stepsConfig, currentStep }: St
       title="Cadastro realizado com sucesso!"
       subtitle="Sua conta de cliente foi criada com sucesso. Agora você já pode acessar o portal e aproveitar todos os recursos disponíveis."
       footer={
-        <Button className="w-full" onClick={() => navigate('/')}>
+        <Button className="w-full" onClick={handleAccessPortal}>
           <LayoutGrid className="h-4 w-4" />
           Acessar portal do usuário →
         </Button>

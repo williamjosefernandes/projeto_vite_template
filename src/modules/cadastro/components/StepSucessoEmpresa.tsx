@@ -9,10 +9,16 @@ export interface StepSucessoEmpresaProps {
   accountType: AccountType;
   stepsConfig: StepItem[];
   currentStep: number;
+  onAccessPortal: () => void;
 }
 
-export function StepSucessoEmpresa({ accountType, stepsConfig, currentStep }: StepSucessoEmpresaProps) {
+export function StepSucessoEmpresa({ accountType, stepsConfig, currentStep, onAccessPortal }: StepSucessoEmpresaProps) {
   const navigate = useNavigate();
+
+  const handleAccessPortal = () => {
+    onAccessPortal();
+    navigate('/');
+  };
 
   return (
     <WizardStepShell
@@ -22,7 +28,7 @@ export function StepSucessoEmpresa({ accountType, stepsConfig, currentStep }: St
       title="Empresa cadastrada com sucesso! 🎉"
       subtitle="Sua empresa foi criada e todas as informações foram salvas com sucesso. Agora você já pode acessar o portal da empresa e aproveitar todos os recursos disponíveis."
       footer={
-        <Button className="w-full" onClick={() => navigate('/')}>
+        <Button className="w-full" onClick={handleAccessPortal}>
           <LayoutGrid className="h-4 w-4" />
           Acessar portal da empresa →
         </Button>

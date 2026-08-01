@@ -1,17 +1,30 @@
+import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { Building2, User } from 'lucide-react';
 import { toast } from 'sonner';
 import { Badge } from '../../components/ui';
 import { PublicLayout } from '../../auth/layouts';
+import { SessionLoadingScreen } from '../../auth/components';
 import { authApi } from '../../auth/api';
 import { applyLoginResponse } from '../../auth/services';
 import { getApiErrorMessage } from '../../auth/utils';
+import type { LoginResponse } from '../../auth/types';
+import {
+  useCompleteOnboarding,
+  useSaveAddress,
+  useSaveCompanyData,
+  useSavePersonalData,
+  useSavePersonalization,
+} from '../../onboarding';
+import { toE164BR, toIsoDate } from '../../lib/masks';
 import { AccountTypeSelector } from './components/AccountTypeSelector';
 import { StepAcesso } from './components/StepAcesso';
 import { StepConfirmarEmail } from './components/StepConfirmarEmail';
-import { StepConta } from './components/StepConta';
+import { StepDadosPessoais } from './components/StepDadosPessoais';
 import { StepEmpresaDados } from './components/StepEmpresaDados';
-import { StepEmpresaEndereco } from './components/StepEmpresaEndereco';
+import { StepEndereco } from './components/StepEndereco';
+import { StepPersonalizacao } from './components/StepPersonalizacao';
+import { StepConfirmacao } from './components/StepConfirmacao';
 import { StepSucessoCliente } from './components/StepSucessoCliente';
 import { StepSucessoEmpresa } from './components/StepSucessoEmpresa';
 import { useCadastroWizard } from './hooks/useCadastroWizard';
@@ -22,10 +35,19 @@ const SELECTION_SUPPORT_TEXT =
 const WIZARD_SUPPORT_TEXT =
   'Crie sua conta e tenha acesso a todos os recursos da plataforma para gerenciar, colaborar e crescer com mais eficiência.';
 
-/** "Burra": só lê `useCadastroWizard` e decide qual Step renderizar dentro do `AuthLayout`. */
+/** "Burra": só lê `useCadastroWizard` e decide qual Step renderizar dentro do `PublicLayout`. */
 export function CadastroPage() {
   const wizard = useCadastroWizard();
-  const { accountType, currentStep, currentStepId, stepsConfig, data, goToNextStep, goToPreviousStep, saveStepData } = wizard;
+  const { accountType, currentStep, currentStepId, stepsConfig, data, goToNextStep, goToPreviousStep, saveStepData, isResumingDraft } =
+    wizard;
+
+  /**
+   * Guarda a sessão nova até o clique em "Acessar portal" (ver comentário em
+   * `useCompleteOnboarding`) — aplicar antes disso faria o `GuestGuard`
+   * redirecionar para `/` assim que `currentAccount` deixasse de ser `null`,
+   * pulando o step de Sucesso inteiro.
+   */
+  const [pendingSession, setPendingSession] = useState<LoginResponse | null>(null);
 
   const registerMutation = useMutation({
     mutationFn: (values: AcessoData) =>
@@ -34,6 +56,7 @@ export function CadastroPage() {
         lastName: values.sobrenome,
         email: values.email,
         password: values.senha,
+        accountType: accountType === 'empresa' ? 'COMPANY' : 'CUSTOMER',
       }),
     onSuccess: (_response, values) => {
       saveStepData('acesso', values);
@@ -61,6 +84,16 @@ export function CadastroPage() {
     onSuccess: () => toast.success('Um novo código foi enviado para o seu e-mail.'),
     onError: (error) => toast.error(getApiErrorMessage(error, 'Não foi possível reenviar o código.')),
   });
+
+  const savePersonalData = useSavePersonalData();
+  const saveCompanyData = useSaveCompanyData();
+  const saveAddress = useSaveAddress();
+  const savePersonalization = useSavePersonalization();
+  const completeOnboarding = useCompleteOnboarding();
+
+  if (isResumingDraft) {
+    return <SessionLoadingScreen />;
+  }
 
   if (!accountType || currentStep < 0) {
     return (
@@ -109,15 +142,28 @@ export function CadastroPage() {
         />
       )}
 
-      {currentStepId === 'conta' && (
-        <StepConta
+      {currentStepId === 'dados-pessoais' && (
+        <StepDadosPessoais
           {...commonProps}
-          defaultValues={data.conta}
+          defaultValues={data.dadosPessoais}
           onBack={goToPreviousStep}
-          onSubmit={(values) => {
-            saveStepData('conta', values);
-            goToNextStep();
-          }}
+          isSubmitting={savePersonalData.isPending}
+          onSubmit={(values) =>
+            savePersonalData.mutate(
+              {
+                document: values.cpf,
+                birthDate: toIsoDate(values.dataNascimento),
+                phone: toE164BR(values.telefone),
+                gender: values.genero,
+              },
+              {
+                onSuccess: () => {
+                  saveStepData('dadosPessoais', values);
+                  goToNextStep();
+                },
+              },
+            )
+          }
         />
       )}
 
@@ -126,27 +172,110 @@ export function CadastroPage() {
           {...commonProps}
           defaultValues={data.empresaDados}
           onBack={goToPreviousStep}
-          onSubmit={(values) => {
-            saveStepData('empresaDados', values);
-            goToNextStep();
-          }}
+          isSubmitting={saveCompanyData.isPending}
+          onSubmit={(values) =>
+            saveCompanyData.mutate(
+              {
+                corporateName: values.razaoSocial,
+                tradeName: values.nomeFantasia,
+                document: values.cnpj,
+                email: values.emailEmpresa,
+                phone: toE164BR(values.telefoneComercial),
+                whatsapp: toE164BR(values.whatsapp),
+                website: values.site || undefined,
+              },
+              {
+                onSuccess: () => {
+                  saveStepData('empresaDados', values);
+                  goToNextStep();
+                },
+              },
+            )
+          }
         />
       )}
 
       {currentStepId === 'endereco' && (
-        <StepEmpresaEndereco
+        <StepEndereco
           {...commonProps}
-          defaultValues={data.empresaEndereco}
+          defaultValues={data.endereco}
           onBack={goToPreviousStep}
-          onSubmit={(values) => {
-            saveStepData('empresaEndereco', values);
-            goToNextStep();
-          }}
+          isSubmitting={saveAddress.isPending}
+          onSubmit={(values) =>
+            saveAddress.mutate(
+              {
+                zipCode: values.cep,
+                street: values.logradouro,
+                number: values.numero,
+                complement: values.complemento || undefined,
+                district: values.bairro,
+                city: values.cidade,
+                state: values.estado,
+                countryId: values.paisId,
+              },
+              {
+                onSuccess: () => {
+                  saveStepData('endereco', values);
+                  goToNextStep();
+                },
+              },
+            )
+          }
         />
       )}
 
-      {currentStepId === 'sucesso' && accountType === 'cliente' && <StepSucessoCliente {...commonProps} />}
-      {currentStepId === 'sucesso' && accountType === 'empresa' && <StepSucessoEmpresa {...commonProps} />}
+      {currentStepId === 'personalizacao' && (
+        <StepPersonalizacao
+          {...commonProps}
+          defaultValues={data.personalizacao}
+          onBack={goToPreviousStep}
+          isSubmitting={savePersonalization.isPending}
+          onSubmit={(values) =>
+            savePersonalization.mutate(
+              {
+                accountName: values.nomeConta,
+                logoUrl: values.logoUrl,
+                language: values.idioma,
+                timezone: values.timezone,
+              },
+              {
+                onSuccess: () => {
+                  saveStepData('personalizacao', values);
+                  goToNextStep();
+                },
+              },
+            )
+          }
+        />
+      )}
+
+      {currentStepId === 'confirmacao' && (
+        <StepConfirmacao
+          {...commonProps}
+          data={data}
+          onBack={goToPreviousStep}
+          isSubmitting={completeOnboarding.isPending}
+          onSubmit={(values) =>
+            completeOnboarding.mutate(
+              { termsAccepted: values.termos, privacyAccepted: values.privacidade },
+              {
+                onSuccess: (response) => {
+                  setPendingSession(response);
+                  saveStepData('confirmacao', values);
+                  goToNextStep();
+                },
+              },
+            )
+          }
+        />
+      )}
+
+      {currentStepId === 'sucesso' && accountType === 'cliente' && (
+        <StepSucessoCliente {...commonProps} onAccessPortal={() => pendingSession && applyLoginResponse(pendingSession)} />
+      )}
+      {currentStepId === 'sucesso' && accountType === 'empresa' && (
+        <StepSucessoEmpresa {...commonProps} onAccessPortal={() => pendingSession && applyLoginResponse(pendingSession)} />
+      )}
     </PublicLayout>
   );
 }

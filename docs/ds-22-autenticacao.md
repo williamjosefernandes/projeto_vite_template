@@ -1,6 +1,6 @@
 # DS-22 — Menu "Autenticação" (fluxo de Cadastro)
 
-Documento estrutural e permanente. Substitui a versão provisória anterior — o print real do fluxo de cadastro (8 telas) foi recebido e implementado como rota funcional `/cadastro`. Faz parte da série `docs/ds-*` (ver `docs/ds-00-estrutura-e-visao-geral.md`).
+Documento estrutural e permanente. Faz parte da série `docs/ds-*` (ver `docs/ds-00-estrutura-e-visao-geral.md`). **Atualizado na Fase 10** (`docs/10-onboarding-cadastro.md`) — o wizard passou a persistir cada step no backend (rascunho por etapa) em vez de ser só estado local; a tabela de steps e a lista de componentes abaixo refletem o fluxo atual.
 
 ## Rota
 
@@ -14,10 +14,10 @@ O cadastro tem uma tela inicial de seleção de tipo de conta (Step 0, sem núme
 
 | Tipo | Steps |
 |---|---|
-| Cliente | Acesso → Confirmar e-mail → Conta → Sucesso (4) |
-| Empresa | Acesso → Confirmar e-mail → Conta → Empresa → Endereço → Sucesso (6) |
+| Cliente | Acesso → Confirmar e-mail → Dados pessoais → Endereço → Confirmação → Sucesso (6) |
+| Empresa | Acesso → Confirmar e-mail → Empresa → Endereço → Personalização → Confirmação → Sucesso (7) |
 
-Os 3 primeiros steps são idênticos (mesmos componentes `StepAcesso`/`StepConfirmarEmail`/`StepConta`) — a ramificação acontece só a partir do Step 4, decidida dinamicamente por `accountType` em `useCadastroWizard`. Não há duplicação de tela: `stepsConfig` é montado uma vez por tipo de conta e `CadastroPage` decide qual componente renderizar a partir de `currentStepId`.
+Os 2 primeiros steps são idênticos (mesmos componentes `StepAcesso`/`StepConfirmarEmail`); Endereço e Confirmação também são compartilhados (`StepEndereco`/`StepConfirmacao`, parametrizados por `accountType`) — só Dados pessoais/Empresa/Personalização são exclusivos de um fluxo. A ramificação é decidida dinamicamente por `accountType` em `useCadastroWizard`. Não há duplicação de tela: `stepsConfig` é montado uma vez por tipo de conta e `CadastroPage` decide qual componente renderizar a partir de `currentStepId`.
 
 ## Arquitetura (`src/modules/cadastro/`)
 
@@ -25,13 +25,15 @@ Os 3 primeiros steps são idênticos (mesmos componentes `StepAcesso`/`StepConfi
 components/
 ├── WizardStepShell.tsx       # stepper + título/subtítulo + conteúdo + rodapé (comum a todos os steps do wizard)
 ├── AccountTypeSelector.tsx   # Step 0
-├── StepAcesso.tsx            # Step 1
-├── StepConfirmarEmail.tsx    # Step 2 (com timer de reenvio)
-├── StepConta.tsx             # Step 3
-├── StepEmpresaDados.tsx      # Step 4 (empresa)
-├── StepEmpresaEndereco.tsx   # Step 5 (empresa, com busca de CEP via ViaCEP)
-├── StepSucessoCliente.tsx    # Step 4 (cliente)
-└── StepSucessoEmpresa.tsx    # Step 6 (empresa)
+├── StepAcesso.tsx            # Step 1 — POST /auth/register
+├── StepConfirmarEmail.tsx    # Step 2 — POST /auth/verify-email + /auth/login (com timer de reenvio)
+├── StepDadosPessoais.tsx     # Step 3 (cliente) — PATCH /onboarding/draft/personal-data
+├── StepEmpresaDados.tsx      # Step 3 (empresa) — PATCH /onboarding/draft/company-data
+├── StepEndereco.tsx          # Step 4 (ambos, compartilhado) — PATCH /onboarding/draft/address, busca de CEP via ViaCEP
+├── StepPersonalizacao.tsx    # Step 5 (empresa) — PATCH /onboarding/draft/personalization
+├── StepConfirmacao.tsx       # Step 5 (cliente) / Step 6 (empresa), compartilhado — resumo + termos/privacidade + POST /onboarding/complete
+├── StepSucessoCliente.tsx    # Step 6 (cliente)
+└── StepSucessoEmpresa.tsx    # Step 7 (empresa)
 hooks/
 └── useCadastroWizard.ts
 schemas/
@@ -39,9 +41,11 @@ schemas/
 CadastroPage.tsx               # "burra": só lê o hook e decide qual Step renderizar
 ```
 
+Detalhamento completo dos endpoints, da estratégia de persistência (rascunho no backend, não localStorage) e da retomada de rascunho: `docs/10-onboarding-cadastro.md`.
+
 ### `useCadastroWizard`
 
-Expõe: `accountType`, `selectAccountType(type)`, `currentStep` (-1 = Step 0/seleção), `totalSteps`, `stepsConfig` (array `{id, label}` já filtrado pelo tipo), `currentStepId`, `goToNextStep`, `goToPreviousStep` (volta ao Step 0 se estiver no primeiro step do wizard), `data` (acumulado de cada step) e `saveStepData(key, value)`.
+Expõe: `accountType`, `selectAccountType(type)`, `currentStep` (-1 = Step 0/seleção), `totalSteps`, `stepsConfig` (array `{id, label}` já filtrado pelo tipo), `currentStepId`, `goToNextStep`, `goToPreviousStep` (volta ao Step 0 se estiver no primeiro step do wizard), `data` (acumulado de cada step), `saveStepData(key, value)` e `isResumingDraft` (retomando um rascunho salvo no backend — ver `docs/10-onboarding-cadastro.md`).
 
 ### Validação
 
@@ -58,7 +62,7 @@ Regras principais: e-mail válido, senha ≥ 8 caracteres com letra e número, c
 
 ### Busca de CEP
 
-`StepEmpresaEndereco` usa a API pública `viacep.com.br` (real, sem chave) para preencher Logradouro/Bairro/Cidade/Estado a partir do CEP digitado. Falha de rede é silenciosa — usuário preenche manualmente.
+`StepEndereco` usa a API pública `viacep.com.br` (real, sem chave) para preencher Logradouro/Bairro/Cidade/Estado a partir do CEP digitado. Falha de rede é silenciosa — usuário preenche manualmente. `Cidade`/`Estado` continuam texto livre (sem FK para `State`/`City`) — decisão explícita, ver `docs/10-onboarding-cadastro.md §2`.
 
 ## Componentes novos criados nesta etapa
 

@@ -39,6 +39,8 @@ const ERROR_MESSAGES: Partial<Record<ErrorCode, string>> = {
   CANNOT_DELETE_OWNER: 'O proprietário da conta não pode ser removido.',
   CANNOT_BLOCK_OWNER: 'O proprietário da conta não pode ser bloqueado.',
   RATE_LIMITED: 'Muitas tentativas em pouco tempo. Aguarde um momento e tente novamente.',
+  DOCUMENT_ALREADY_IN_USE: 'Este CPF/CNPJ já está cadastrado em outra conta.',
+  PHONE_ALREADY_IN_USE: 'Este telefone já está cadastrado em outra conta.',
 };
 
 /** Extrai uma mensagem amigável de um erro do axios, com fallback para erros inesperados/sem código mapeado. */

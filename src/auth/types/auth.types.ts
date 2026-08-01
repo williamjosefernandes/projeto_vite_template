@@ -15,6 +15,8 @@ export interface RegisterRequest {
   lastName?: string;
   email: string;
   password: string;
+  /** Escolhido no Step 0 do wizard (`AccountTypeSelector`) — molda o resto do onboarding. */
+  accountType: 'CUSTOMER' | 'COMPANY';
 }
 
 export interface ForgotPasswordRequest {

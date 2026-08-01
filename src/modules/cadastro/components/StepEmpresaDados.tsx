@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { Building2, CreditCard, Globe, Image, Mail, MessageCircle, Phone } from 'lucide-react';
+import { Building2, CreditCard, Globe, Image, Loader2, Mail, MessageCircle, Phone } from 'lucide-react';
 import { Button, ImageUpload, Input } from '../../../components/ui';
 import { WizardStepShell } from './WizardStepShell';
 import { empresaDadosSchema, type EmpresaDadosData } from '../schemas/cadastro.schemas';
@@ -15,9 +15,19 @@ export interface StepEmpresaDadosProps {
   defaultValues?: Partial<EmpresaDadosData>;
   onSubmit: (data: EmpresaDadosData) => void;
   onBack: () => void;
+  isSubmitting?: boolean;
 }
 
-export function StepEmpresaDados({ accountType, stepsConfig, currentStep, defaultValues, onSubmit, onBack }: StepEmpresaDadosProps) {
+/** `PATCH /v1/onboarding/draft/company-data` — Step "Empresa" (Company). */
+export function StepEmpresaDados({
+  accountType,
+  stepsConfig,
+  currentStep,
+  defaultValues,
+  onSubmit,
+  onBack,
+  isSubmitting,
+}: StepEmpresaDadosProps) {
   const {
     register,
     handleSubmit,
@@ -40,11 +50,12 @@ export function StepEmpresaDados({ accountType, stepsConfig, currentStep, defaul
       securityNote="Suas informações estão seguras e protegidas."
       footer={
         <div className="flex gap-3">
-          <Button type="button" variant="secondary" onClick={onBack}>
+          <Button type="button" variant="secondary" onClick={onBack} disabled={isSubmitting}>
             ← Voltar
           </Button>
-          <Button type="submit" form="step-empresa-dados-form">
-            Continuar →
+          <Button type="submit" form="step-empresa-dados-form" disabled={isSubmitting}>
+            {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
+            {isSubmitting ? 'Salvando…' : 'Continuar →'}
           </Button>
         </div>
       }
