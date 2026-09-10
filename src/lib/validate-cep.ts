@@ -1,6 +1,8 @@
 /**
  * Validação de CEP (WILLI-7): aceita 00000-000 ou 8 dígitos e devolve o CEP normalizado.
  * Resultado tipado: nenhum erro é lançado por entrada inválida.
+ *
+ * @example validateCep('88015-100') // { valid: true, digits: '88015100', formatted: '88015-100' }
  */
 export type CepValidationReason = 'EMPTY' | 'INVALID_LENGTH' | 'RESERVED';
 
